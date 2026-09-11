@@ -31,6 +31,15 @@ export interface OrgPresetItem {
 
 export const GLOBAL_ORG_PRESETS: OrgPresetItem[] = [
   {
+    id: "mcu-humanities-foreign-lang",
+    nameTh: "บัณฑิตศึกษา ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์ มหาวิทยาลัยมหาจุฬาลงกรณราชวิทยาลัย",
+    nameEn: "Graduate Studies, Department of Foreign Languages, Faculty of Humanities, Mahachulalongkornrajavidyalaya University",
+    category: "graduate",
+    categoryLabel: "บัณฑิตศึกษา / ภาษาต่างประเทศ (MCU)",
+    icon: GraduationCap,
+    description: "หลักสูตรบัณฑิตศึกษา ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์ มหาวิทยาลัยมหาจุฬาลงกรณราชวิทยาลัย",
+  },
+  {
     id: "grad-school-innov",
     nameTh: "บัณฑิตวิทยาลัย มหาวิทยาลัยนวัตกรรมและการวิจัย",
     nameEn: "The Graduate School of Innovation and Advanced Research",
