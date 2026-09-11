@@ -3,22 +3,37 @@ import { prisma, type Db } from "@/shared/lib/infra/prisma";
 import { DEFAULT_PALETTE, isPalette, type PaletteId } from "@/shared/lib/palette";
 import { errors } from "@/shared/lib/errors";
 import { writeAudit } from "../audit";
-import type { UpdateSettingsInput } from "../validations/settings";
+import type { UpdateSettingsInput, SmtpSettings } from "../validations/settings";
 
-export interface TenantSettings { code: string; nameTh: string; nameEn: string; logoUrl: string | null; palette: PaletteId }
+export interface TenantSettings {
+  code: string;
+  nameTh: string;
+  nameEn: string;
+  logoUrl: string | null;
+  palette: PaletteId;
+  smtp?: SmtpSettings;
+}
 
 async function readTenantSettings(tenantId: string, db: Db): Promise<TenantSettings> {
   const t = await db.tenant.findUnique({ where: { id: tenantId } });
   if (!t) throw errors.not_found();
-  const p = (t.settings as { palette?: unknown }).palette;
-  return { code: t.code, nameTh: t.nameTh, nameEn: t.nameEn, logoUrl: t.logoUrl, palette: isPalette(p) ? p : DEFAULT_PALETTE };
+  const s = t.settings as { palette?: unknown; smtp?: SmtpSettings } | null;
+  const p = s?.palette;
+  return {
+    code: t.code,
+    nameTh: t.nameTh,
+    nameEn: t.nameEn,
+    logoUrl: t.logoUrl,
+    palette: isPalette(p) ? p : DEFAULT_PALETTE,
+    smtp: s?.smtp,
+  };
 }
 
 export async function getTenantSettings(tenantId: string): Promise<TenantSettings> {
   return readTenantSettings(tenantId, prisma);
 }
 
-/** เก็บคีย์อื่น ๆ ใน settings JSON ไว้ทั้งหมด — merge เฉพาะ palette ที่เปลี่ยน ไม่ทับทั้งก้อน */
+/** เก็บคีย์อื่น ๆ ใน settings JSON ไว้ทั้งหมด — merge เฉพาะ palette และ smtp ที่เปลี่ยน ไม่ทับทั้งก้อน */
 export async function updateTenantSettings(input: { tenantId: string; actorId: string } & UpdateSettingsInput): Promise<void> {
   await prisma.$transaction(async (tx) => {
     // อ่านผ่าน tx เดียวกัน ไม่ใช่ client กลาง — ไม่งั้นทรานแซกชันนี้กินคอนเนกชันจากพูลเพิ่มอีกเส้นเพื่ออ่าน
@@ -27,7 +42,16 @@ export async function updateTenantSettings(input: { tenantId: string; actorId: s
     const t = await tx.tenant.findUniqueOrThrow({ where: { id: input.tenantId }, select: { settings: true } });
     await tx.tenant.update({
       where: { id: input.tenantId },
-      data: { nameTh: input.nameTh, nameEn: input.nameEn, logoUrl: input.logoUrl || null, settings: { ...(t.settings as object), palette: input.palette } },
+      data: {
+        nameTh: input.nameTh,
+        nameEn: input.nameEn,
+        logoUrl: input.logoUrl || null,
+        settings: {
+          ...(t.settings as object),
+          palette: input.palette,
+          smtp: input.smtp,
+        },
+      },
     });
     await writeAudit({ tenantId: input.tenantId, actorId: input.actorId, action: "tenant.settings_update", entity: "tenant", entityId: input.tenantId, before, after: input }, tx);
   });
@@ -63,3 +87,39 @@ export const resolvePalette = cache(async (): Promise<PaletteId> => {
     return DEFAULT_PALETTE;
   }
 });
+
+export interface TenantInfo {
+  nameTh: string;
+  nameEn: string;
+  logoUrl: string | null;
+}
+
+/** ดึงข้อมูลชื่อองค์กรสำหรับแสดงผลใน Navbar ทั้ง Portal และ Admin · แคชต่อ Request และไม่ throw */
+export const resolveTenantInfo = cache(async (): Promise<TenantInfo> => {
+  try {
+    const tenantId = (await sessionTenantId()) || (await prisma.tenant.findFirst({ orderBy: { createdAt: "asc" }, select: { id: true } }))?.id;
+    if (!tenantId) {
+      return {
+        nameTh: "องค์กรตัวอย่าง",
+        nameEn: "Sample Organization",
+        logoUrl: null,
+      };
+    }
+    const t = await prisma.tenant.findUnique({
+      where: { id: tenantId },
+      select: { nameTh: true, nameEn: true, logoUrl: true },
+    });
+    return {
+      nameTh: t?.nameTh || "องค์กรตัวอย่าง",
+      nameEn: t?.nameEn || "Sample Organization",
+      logoUrl: t?.logoUrl || null,
+    };
+  } catch {
+    return {
+      nameTh: "องค์กรตัวอย่าง",
+      nameEn: "Sample Organization",
+      logoUrl: null,
+    };
+  }
+});
+

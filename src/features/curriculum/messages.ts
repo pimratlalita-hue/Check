@@ -1,0 +1,134 @@
+import type { Dictionary } from "@/shared/lib/i18n/translate";
+
+export const MESSAGES: Dictionary = {
+  "curriculum.nav": { th: "หลักสูตรการศึกษา", en: "Curriculum & Programs" },
+  "curriculum.title": { th: "จัดการหลักสูตรการศึกษา", en: "Academic Programs Management" },
+  "curriculum.description": {
+    th: "จัดการหลักสูตรระดับปริญญาตรี ปริญญาโท ปริญญาเอก โครงสร้างรายวิชา และแผนการศึกษา",
+    en: "Manage degree programs, curriculum structure, courses, and study plans",
+  },
+  "curriculum.portalTitle": { th: "หลักสูตรการศึกษา", en: "Academic Programs" },
+  "curriculum.portalSubtitle": {
+    th: "หลักสูตรระดับปริญญาตรี บัณฑิตศึกษา และหลักสูตรนานาชาติ คณะวิทยาการและเทคโนโลยีสารสนเทศ",
+    en: "Undergraduate, graduate, and international degree programs",
+  },
+  "curriculum.allLevels": { th: "ทุกระดับการศึกษา", en: "All Degree Levels" },
+  "curriculum.allPrograms": { th: "หลักสูตรทั้งหมด", en: "All Programs" },
+  "curriculum.bachelor": { th: "ปริญญาตรี", en: "Bachelor's Degree" },
+  "curriculum.master": { th: "ปริญญาโท", en: "Master's Degree" },
+  "curriculum.doctoral": { th: "ปริญญาเอก", en: "Doctoral Degree" },
+  "curriculum.certificate": { th: "ประกาศนียบัตร", en: "Certificate / Non-Degree" },
+  "curriculum.searchPlaceholder": {
+    th: "ค้นหาชื่อหลักสูตร, รหัสหลักสูตร, ปริญญา...",
+    en: "Search by program name, code, degree...",
+  },
+  "curriculum.filterByLevel": { th: "ระดับการศึกษา", en: "Degree Level" },
+  "curriculum.filterByType": { th: "ประเภทหลักสูตร", en: "Program Type" },
+  "curriculum.filterByStatus": { th: "สถานะ", en: "Status" },
+  "curriculum.empty": { th: "ไม่พบข้อมูลหลักสูตร", en: "No academic programs found" },
+  "curriculum.emptyDesc": {
+    th: "ลองปรับเงื่อนไขการค้นหาหรือเพิ่มหลักสูตรใหม่ในระบบ",
+    en: "Try adjusting your search filters or add a new program",
+  },
+  "curriculum.create": { th: "สร้างหลักสูตรใหม่", en: "Add New Program" },
+  "curriculum.edit": { th: "แก้ไขหลักสูตร", en: "Edit Program" },
+  "curriculum.delete": { th: "ลบหลักสูตร", en: "Delete Program" },
+  "curriculum.deleteConfirm": {
+    th: "คุณแน่ใจหรือไม่ว่าต้องการลบหลักสูตรนี้? ข้อมูลรายวิชาทั้งหมดในหลักสูตรจะถูกลบไปด้วย",
+    en: "Are you sure you want to delete this program? All associated courses will also be deleted.",
+  },
+  "curriculum.viewDetails": { th: "ดูรายละเอียดหลักสูตร", en: "View Program Details" },
+  "curriculum.backToList": { th: "กลับสู่หน้ารายการหลักสูตร", en: "Back to Programs" },
+  "curriculum.downloadHandbook": { th: "ดาวน์โหลดเล่มหลักสูตร (มคอ.2)", en: "Download Curriculum PDF" },
+  "curriculum.noHandbook": { th: "ไม่มีไฟล์เอกสาร มคอ.2", en: "Handbook not available" },
+  "curriculum.overview": { th: "ภาพรวมหลักสูตร", en: "Program Overview" },
+  "curriculum.degreeTitle": { th: "ชื่อปริญญา", en: "Degree Title" },
+  "curriculum.credits": { th: "หน่วยกิตรวม", en: "Total Credits" },
+  "curriculum.creditsUnit": { th: "หน่วยกิต", en: "credits" },
+  "curriculum.studyDuration": { th: "ระยะเวลาศึกษา", en: "Study Duration" },
+  "curriculum.tuitionFee": { th: "ค่าธรรมเนียมการศึกษา", en: "Tuition Fee" },
+  "curriculum.philosophy": { th: "ปรัชญาและความสำคัญของหลักสูตร", en: "Curriculum Philosophy" },
+  "curriculum.learningOutcomes": { th: "ผลลัพธ์การเรียนรู้ที่คาดหวัง (PLOs)", en: "Program Learning Outcomes (PLOs)" },
+  "curriculum.careerPaths": { th: "แนวทางการประกอบอาชีพ", en: "Career Opportunities" },
+  "curriculum.structure": { th: "โครงสร้างหลักสูตรและรายวิชา", en: "Curriculum Structure & Courses" },
+  "curriculum.manageCourses": { th: "จัดการรายวิชา", en: "Manage Courses" },
+  "curriculum.addCourse": { th: "เพิ่มรายวิชา", en: "Add Course" },
+  "curriculum.editCourse": { th: "แก้ไขรายวิชา", en: "Edit Course" },
+  "curriculum.deleteCourse": { th: "ลบรายวิชา", en: "Delete Course" },
+  "curriculum.deleteCourseConfirm": {
+    th: "คุณแน่ใจหรือไม่ว่าต้องการลบรายวิชานี้ออกจากหลักสูตร?",
+    en: "Are you sure you want to delete this course from the curriculum?",
+  },
+  "curriculum.relatedFaculty": { th: "อาจารย์ผู้รับผิดชอบหลักสูตร", en: "Program Faculty" },
+
+  // Fields
+  "curriculum.code": { th: "รหัสหลักสูตร", en: "Program Code" },
+  "curriculum.nameTh": { th: "ชื่อหลักสูตร (ไทย)", en: "Program Name (Thai)" },
+  "curriculum.nameEn": { th: "ชื่อหลักสูตร (อังกฤษ)", en: "Program Name (English)" },
+  "curriculum.degreeTh": { th: "ชื่อปริญญาเต็ม (ไทย)", en: "Degree Name (Thai)" },
+  "curriculum.degreeEn": { th: "ชื่อปริญญาเต็ม (อังกฤษ)", en: "Degree Name (English)" },
+  "curriculum.degreeShortTh": { th: "ชื่อย่อปริญญา (ไทย)", en: "Abbr. Degree (Thai)" },
+  "curriculum.degreeShortEn": { th: "ชื่อย่อปริญญา (อังกฤษ)", en: "Abbr. Degree (English)" },
+  "curriculum.slug": { th: "URL Slug", en: "URL Slug" },
+  "curriculum.department": { th: "ภาควิชา / สาขาวิชา", en: "Department" },
+  "curriculum.handbookUrl": { th: "URL ไฟล์เอกสาร มคอ.2", en: "Curriculum Handbook URL" },
+  "curriculum.imageUrl": { th: "URL รูปภาพปกหลักสูตร", en: "Cover Image URL" },
+  "curriculum.order": { th: "ลำดับแสดงผล", en: "Display Order" },
+  "curriculum.status": { th: "สถานะ", en: "Status" },
+
+  // Course Fields
+  "curriculum.courseCode": { th: "รหัสวิชา", en: "Course Code" },
+  "curriculum.courseNameTh": { th: "ชื่อวิชา (ไทย)", en: "Course Name (Thai)" },
+  "curriculum.courseNameEn": { th: "ชื่อวิชา (อังกฤษ)", en: "Course Name (English)" },
+  "curriculum.courseCredits": { th: "หน่วยกิต", en: "Credits" },
+  "curriculum.courseCreditHours": { th: "ชั่วโมงบรรยาย-ปฏิบัติ-ศึกษาด้วยตนเอง", en: "Credit Hours (L-P-S)" },
+  "curriculum.courseCategory": { th: "หมวดหมู่วิชา", en: "Course Category" },
+  "curriculum.courseYear": { th: "ชั้นปีที่แนะนำ", en: "Recommended Year" },
+  "curriculum.courseSemester": { th: "ภาคการศึกษา", en: "Semester" },
+  "curriculum.coursePrerequisite": { th: "วิชาบังคับก่อน", en: "Prerequisite" },
+  "curriculum.courseDescTh": { th: "คำอธิบายรายวิชา (ไทย)", en: "Course Description (Thai)" },
+  "curriculum.courseDescEn": { th: "คำอธิบายรายวิชา (อังกฤษ)", en: "Course Description (English)" },
+
+  // Enums - DegreeLevel
+  "curriculum.level.BACHELOR": { th: "ปริญญาตรี", en: "Bachelor's Degree" },
+  "curriculum.level.MASTER": { th: "ปริญญาโท", en: "Master's Degree" },
+  "curriculum.level.DOCTORAL": { th: "ปริญญาเอก", en: "Doctoral Degree" },
+  "curriculum.level.CERTIFICATE": { th: "ประกาศนียบัตร", en: "Certificate" },
+
+  // Enums - ProgramType
+  "curriculum.type.THAI": { th: "หลักสูตรภาษาไทย", en: "Thai Program" },
+  "curriculum.type.INTERNATIONAL": { th: "หลักสูตรนานาชาติ", en: "International Program" },
+  "curriculum.type.BILINGUAL": { th: "หลักสูตรสองภาษา", en: "Bilingual Program" },
+
+  // Enums - ProgramStatus
+  "curriculum.status.DRAFT": { th: "ฉบับร่าง", en: "Draft" },
+  "curriculum.status.ACTIVE": { th: "เปิดสอน (ใช้งาน)", en: "Active" },
+  "curriculum.status.REVISED": { th: "อยู่ระหว่างปรับปรุง", en: "Under Revision" },
+  "curriculum.status.ARCHIVED": { th: "ปิดหลักสูตร/จัดเก็บ", en: "Archived" },
+
+  // Enums - CourseCategory
+  "curriculum.category.GENERAL_EDUCATION": { th: "หมวดวิชาศึกษาทั่วไป", en: "General Education" },
+  "curriculum.category.CORE_COURSE": { th: "หมวดวิชาเฉพาะ / บังคับ", en: "Core / Required Courses" },
+  "curriculum.category.MAJOR_ELECTIVE": { th: "หมวดวิชาเลือกเฉพาะสาขา", en: "Major Electives" },
+  "curriculum.category.FREE_ELECTIVE": { th: "หมวดวิชาเลือกเสรี", en: "Free Electives" },
+  "curriculum.category.THESIS": { th: "วิทยานิพนธ์ / สารนิพนธ์", en: "Thesis / Capstone Project" },
+
+  // Dialog tabs
+  "curriculum.tab.general": { th: "ข้อมูลทั่วไป", en: "General Info" },
+  "curriculum.tab.details": { th: "รายละเอียด & ปรัชญา", en: "Philosophy & Details" },
+  "curriculum.tab.outcomes": { th: "ผลลัพธ์การเรียนรู้ & อาชีพ", en: "Outcomes & Careers" },
+  "curriculum.tab.courses": { th: "โครงสร้างรายวิชา", en: "Curriculum Courses" },
+
+  // Notifications / Toasts
+  "curriculum.createdSuccess": { th: "สร้างหลักสูตรเรียบร้อยแล้ว", en: "Program created successfully" },
+  "curriculum.updatedSuccess": { th: "บันทึกการแก้ไขหลักสูตรเรียบร้อยแล้ว", en: "Program updated successfully" },
+  "curriculum.deletedSuccess": { th: "ลบหลักสูตรเรียบร้อยแล้ว", en: "Program deleted successfully" },
+  "curriculum.courseCreatedSuccess": { th: "เพิ่มรายวิชาเรียบร้อยแล้ว", en: "Course added successfully" },
+  "curriculum.courseUpdatedSuccess": { th: "แก้ไขรายวิชาเรียบร้อยแล้ว", en: "Course updated successfully" },
+  "curriculum.courseDeletedSuccess": { th: "ลบรายวิชาเรียบร้อยแล้ว", en: "Course deleted successfully" },
+
+  // Role permissions UI
+  "roles.module.curriculum": { th: "ระบบจัดการหลักสูตรการศึกษา", en: "Curriculum & Programs Module" },
+  "perm.curriculum:read": { th: "ดูข้อมูลหลักสูตรในระบบหลังบ้าน", en: "View admin curriculum & programs" },
+  "perm.curriculum:manage": { th: "สร้าง แก้ไข จัดการรายวิชา และเผยแพร่หลักสูตร", en: "Manage programs, courses & curriculum" },
+};

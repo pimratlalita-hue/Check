@@ -9,11 +9,29 @@ process.env.APP_URL ??= "http://localhost:3010";
 
 const { prisma } = await import("@/shared/lib/infra/prisma");
 
+const tables = [
+  "audit_logs",
+  "login_throttles",
+  "auth_tokens",
+  "role_permissions",
+  "user_roles",
+  "roles",
+  "user_tenants",
+  "users",
+  "permissions",
+  "tenants",
+  "sample_items",
+  "news_attachments",
+  "news_articles",
+];
+
 /** ล้างทุกตารางก่อนแต่ละเทสต์ — แต่ละเทสต์ seed เองเท่าที่ต้องใช้ */
 export async function resetDb() {
-  await prisma.$executeRawUnsafe(
-    'TRUNCATE TABLE "audit_logs","login_throttles","auth_tokens","role_permissions","user_roles","roles","user_tenants","users","permissions","tenants" RESTART IDENTITY CASCADE',
-  );
+  await prisma.$executeRawUnsafe("SET FOREIGN_KEY_CHECKS = 0;");
+  for (const table of tables) {
+    await prisma.$executeRawUnsafe(`TRUNCATE TABLE \`${table}\`;`);
+  }
+  await prisma.$executeRawUnsafe("SET FOREIGN_KEY_CHECKS = 1;");
 }
 
 beforeEach(async () => { await resetDb(); });

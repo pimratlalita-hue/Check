@@ -30,7 +30,7 @@ export async function listUsers(tenantId: string, q: ListUsersQuery): Promise<{ 
     tenantId,
     ...(q.status === "active" ? { isActive: true, user: { isActive: true } } : q.status === "inactive" ? { OR: [{ isActive: false }, { user: { isActive: false } }] } : {}),
     ...(q.roleId ? { userRoles: { some: { roleId: q.roleId } } } : {}),
-    ...(q.search ? { user: { OR: [{ name: { contains: q.search, mode: "insensitive" as const } }, { email: { contains: q.search, mode: "insensitive" as const } }] } } : {}),
+    ...(q.search ? { user: { OR: [{ name: { contains: q.search } }, { email: { contains: q.search } }] } } : {}),
   };
   const [rows, total] = await Promise.all([
     prisma.userTenant.findMany({ where, skip: (q.page - 1) * q.perPage, take: q.perPage, orderBy: { user: { name: "asc" } }, include: { user: true, userRoles: { select: roleSelect } } }),

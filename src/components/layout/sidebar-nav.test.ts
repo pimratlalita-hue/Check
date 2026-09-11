@@ -2,7 +2,7 @@ import { describe, it, expect } from "vitest";
 import { sidebarGroups, getActiveNavChain, visibleGroups } from "./sidebar-nav";
 
 const viewer = { roles: [], permissions: ["users:read"], isSuperAdmin: false };
-const admin = { roles: [], permissions: ["users:read", "users:manage", "roles:manage", "settings:manage"], isSuperAdmin: false };
+const admin = { roles: [], permissions: ["users:read", "users:manage", "roles:manage", "settings:manage", "news:read", "staff:read", "curriculum:read", "workflow:read", "facility:read", "biometrics:read", "backup:manage"], isSuperAdmin: false };
 
 describe("sidebar-nav", () => {
   it("แดชบอร์ดไม่ต้องมีสิทธิ์", () => {
@@ -16,7 +16,7 @@ describe("sidebar-nav", () => {
   });
   it("admin เห็นครบ และกลุ่มที่ไม่มีรายการเหลือถูกตัด", () => {
     const groups = visibleGroups(admin);
-    expect(groups.flatMap((g) => g.items.map((i) => i.href))).toEqual(expect.arrayContaining(["/dashboard", "/users", "/settings"]));
+    expect(groups.flatMap((g) => g.items.map((i) => i.href))).toEqual(expect.arrayContaining(["/dashboard", "/users", "/settings", "/news", "/staff", "/curriculum", "/workflow", "/facility", "/biometrics", "/backup"]));
     expect(groups.every((g) => g.items.length > 0)).toBe(true);
   });
   it("getActiveNavChain เลือก href ที่ตรงที่สุด", () => {
@@ -24,5 +24,5 @@ describe("sidebar-nav", () => {
     expect(getActiveNavChain("/settings").map((c) => c.href)).toEqual(["/settings"]);
     expect(getActiveNavChain("/nowhere")).toEqual([]);
   });
-  it("โครงเมนูมี 3 กลุ่ม", () => expect(sidebarGroups).toHaveLength(3));
+  it("โครงเมนูมี 10 กลุ่ม", () => expect(sidebarGroups).toHaveLength(10));
 });

@@ -1,6 +1,13 @@
-import { LayoutDashboard, Users, Settings, Layers, type LucideIcon } from "lucide-react";
+import { LayoutDashboard, Users, Settings, Layers, Newspaper, UserCheck, GraduationCap, FileCheck, CalendarCheck, ScanFace, DatabaseBackup, type LucideIcon } from "lucide-react";
 import { hasPermission, P } from "@/features/identity";
 import { SAMPLE_P } from "@/features/sample";
+import { NEWS_P } from "@/features/news";
+import { STAFF_P } from "@/features/staff";
+import { CURRICULUM_P } from "@/features/curriculum";
+import { WORKFLOW_P } from "@/features/workflow";
+import { FACILITY_P } from "@/features/facility";
+import { BIOMETRICS_P } from "@/features/biometrics";
+import { BACKUP_P } from "@/features/backup";
 
 export interface NavItem {
   /** i18n key */
@@ -17,6 +24,30 @@ export interface NavCrumb { title: string; href: string }
 export const sidebarGroups: NavGroup[] = [
   { label: "nav.group.overview", items: [{ title: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard }] },
   {
+    label: "news.nav",
+    items: [{ title: "news.nav", href: "/news", icon: Newspaper, permission: NEWS_P.newsRead }],
+  },
+  {
+    label: "staff.nav",
+    items: [{ title: "staff.nav", href: "/staff", icon: UserCheck, permission: STAFF_P.staffRead }],
+  },
+  {
+    label: "curriculum.nav",
+    items: [{ title: "curriculum.nav", href: "/curriculum", icon: GraduationCap, permission: CURRICULUM_P.curriculumRead }],
+  },
+  {
+    label: "workflow.nav",
+    items: [{ title: "workflow.nav", href: "/workflow", icon: FileCheck, permission: WORKFLOW_P.workflowRead }],
+  },
+  {
+    label: "facility.nav",
+    items: [{ title: "facility.nav", href: "/facility", icon: CalendarCheck, permission: FACILITY_P.facilityRead }],
+  },
+  {
+    label: "biometrics.title",
+    items: [{ title: "biometrics.navAttendance", href: "/biometrics", icon: ScanFace, permission: BIOMETRICS_P.read }],
+  },
+  {
     label: "nav.group.sample",
     items: [{ title: "sample.nav", href: "/sample", icon: Layers, permission: SAMPLE_P.sampleRead }],
   },
@@ -30,7 +61,13 @@ export const sidebarGroups: NavGroup[] = [
       ],
     }],
   },
-  { label: "nav.group.settings", items: [{ title: "nav.settings", href: "/settings", icon: Settings, permission: P.settingsManage }] },
+  {
+    label: "nav.group.settings",
+    items: [
+      { title: "nav.settings", href: "/settings", icon: Settings, permission: P.settingsManage },
+      { title: "backup.nav", href: "/backup", icon: DatabaseBackup, permission: BACKUP_P.backupManage },
+    ],
+  },
 ];
 
 type Ctx = Parameters<typeof hasPermission>[0];

@@ -1,7 +1,7 @@
 import type { Dictionary } from "@/shared/lib/i18n/translate";
 
 export const MESSAGES: Dictionary = {
-  "app.name": { th: "VibeCore", en: "VibeCore" },
+  "app.name": { th: "องค์กรตัวอย่าง", en: "Sample Organization" },
   "app.tagline": { th: "ระบบบริหารจัดการองค์กร", en: "Enterprise Management Framework" },
   "common.save": { th: "บันทึก", en: "Save" },
   "common.cancel": { th: "ยกเลิก", en: "Cancel" },

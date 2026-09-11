@@ -29,10 +29,11 @@ export function PasswordLoginForm() {
     setLoading(true);
     try {
       const r = await signIn("credentials", { email, password, redirect: false });
-      if (r?.error) toast.error(t("auth.invalidCredentials"));
-      else {
-        router.push(safeCallbackUrl(callbackUrl));
-        router.refresh();
+      if (r?.error) {
+        toast.error(t("auth.invalidCredentials"));
+      } else {
+        const dest = safeCallbackUrl(callbackUrl);
+        window.location.href = dest;
       }
     } catch {
       toast.error(t("auth.errorRetry"));
@@ -57,6 +58,61 @@ export function PasswordLoginForm() {
           </span>
         </div>
         <button className="btn-wide" type="submit" disabled={loading}><LogInIcon />{loading ? t("auth.signingIn") : t("auth.signIn")}</button>
+        <div className="pt-3 border-t border-slate-100 dark:border-slate-800 text-xs">
+          <p className="text-slate-500 mb-1.5 font-medium">เข้าสู่ระบบด้วยบัญชีทดสอบ 5 บทบาท (1-Click Fill):</p>
+          <div className="flex flex-wrap gap-1.5">
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("admin@app.local");
+                setPassword("Passw0rd!vibe");
+              }}
+              className="px-2 py-1 bg-rose-50 text-rose-700 hover:bg-rose-100 rounded text-[11px] font-medium border border-rose-200 transition-colors cursor-pointer"
+            >
+              👑 ผู้ดูแลสูงสุด (Admin)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("advisor@app.local");
+                setPassword("Passw0rd!vibe");
+              }}
+              className="px-2 py-1 bg-amber-50 text-amber-800 hover:bg-amber-100 rounded text-[11px] font-medium border border-amber-200 transition-colors cursor-pointer"
+            >
+              🎓 อาจารย์ที่ปรึกษา (Advisor)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("chair@app.local");
+                setPassword("Passw0rd!vibe");
+              }}
+              className="px-2 py-1 bg-indigo-50 text-indigo-800 hover:bg-indigo-100 rounded text-[11px] font-medium border border-indigo-200 transition-colors cursor-pointer"
+            >
+              ⚖️ ประธานหลักสูตร (Chair)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("dean@app.local");
+                setPassword("Passw0rd!vibe");
+              }}
+              className="px-2 py-1 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 rounded text-[11px] font-medium border border-emerald-200 transition-colors cursor-pointer"
+            >
+              🏛️ เจ้าหน้าที่บัณฑิตฯ (Dean)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail("student@app.local");
+                setPassword("Passw0rd!vibe");
+              }}
+              className="px-2 py-1 bg-slate-100 text-slate-700 hover:bg-slate-200 rounded text-[11px] font-medium border border-slate-200 transition-colors cursor-pointer"
+            >
+              🧑‍🎓 นิสิต (Student)
+            </button>
+          </div>
+        </div>
       </div>
     </form>
   );

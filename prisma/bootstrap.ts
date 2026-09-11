@@ -1,11 +1,11 @@
 import "dotenv/config";
 import { PrismaClient } from "../src/generated/prisma";
-import { PrismaPg } from "@prisma/adapter-pg";
 import bcrypt from "bcryptjs";
 import { seedCore, seedUser } from "./lib/seed-core";
 import { requireDatabaseUrl } from "./lib/require-database-url";
 
-const prisma = new PrismaClient({ adapter: new PrismaPg({ connectionString: requireDatabaseUrl() }) });
+requireDatabaseUrl();
+const prisma = new PrismaClient();
 
 async function main() {
   const email = process.env.BOOTSTRAP_ADMIN_EMAIL;

@@ -19,8 +19,13 @@ export const IDENTITY_PERMISSIONS: readonly PermissionDef[] = [
 /** บทบาทตั้งต้น — seed และ bootstrap ใช้ร่วมกัน */
 export const SUPER_ADMIN_CODE = "SUPER_ADMIN";
 export const DEFAULT_ROLES: ReadonlyArray<{ code: string; nameTh: string; nameEn: string; isSystem: boolean; permissions: readonly string[] }> = [
-  { code: SUPER_ADMIN_CODE, nameTh: "ผู้ดูแลสูงสุด", nameEn: "Super admin", isSystem: true, permissions: [] },
+  { code: SUPER_ADMIN_CODE, nameTh: "ผู้ดูแลสูงสุด (บัณฑิตวิทยาลัย)", nameEn: "Super Admin", isSystem: true, permissions: [] },
   { code: "ADMIN", nameTh: "ผู้ดูแลระบบ", nameEn: "Administrator", isSystem: false, permissions: [P.usersRead, P.usersManage, P.rolesManage, P.settingsManage, P.auditRead] },
+  { code: "ADVISOR", nameTh: "อาจารย์ที่ปรึกษาวิทยานิพนธ์", nameEn: "Thesis Advisor", isSystem: false, permissions: [P.usersRead, "workflow:read", "workflow:manage", "facility:read", "ai:use"] },
+  { code: "COMMITTEE_CHAIR", nameTh: "ประธานหลักสูตร / ประธานกรรมการสอบ", nameEn: "Committee Chair", isSystem: false, permissions: [P.usersRead, "workflow:read", "workflow:manage", "facility:read", "ai:use"] },
+  { code: "DEAN_OFFICE", nameTh: "เจ้าหน้าที่บัณฑิตวิทยาลัย", nameEn: "Dean's Office Staff", isSystem: false, permissions: [P.usersRead, "workflow:read", "workflow:manage", "facility:read", "facility:manage", "biometrics:read", "ai:use"] },
+  { code: "STUDENT", nameTh: "นิสิตระดับบัณฑิตศึกษา", nameEn: "Graduate Student", isSystem: false, permissions: ["facility:read", "biometrics:read", "ai:use"] },
   { code: "STAFF", nameTh: "เจ้าหน้าที่", nameEn: "Staff", isSystem: false, permissions: [P.usersRead] },
   { code: "VIEWER", nameTh: "ผู้ดู", nameEn: "Viewer", isSystem: false, permissions: [P.usersRead] },
 ];
+

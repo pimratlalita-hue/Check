@@ -9,4 +9,6 @@ export { loginSchema, forgotPasswordSchema, resetPasswordSchema, changePasswordS
 export type { UserListItem } from "./_internal/services/user.service";
 export type { RoleItem } from "./_internal/services/role.service";
 export type { RoleAssignment, ListUsersQuery } from "./_internal/validations/users";
-export type { TenantSettings } from "./_internal/services/tenant.service";
+export type { SmtpSettings, TestSmtpInput } from "./_internal/validations/settings";
+export type { TenantSettings, TenantInfo } from "./_internal/services/tenant.service";
+

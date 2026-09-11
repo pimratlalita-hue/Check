@@ -53,7 +53,11 @@ export function UserDialog({
           <LiyonField label={t("users.name")} htmlFor="user-name">
             <input id="user-name" value={form.name} placeholder={t("users.namePh")} onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))} required disabled={isSelf} />
           </LiyonField>
-          <LiyonField label={t("users.email")} htmlFor="user-email">
+          <LiyonField
+            label={t("users.email")}
+            htmlFor="user-email"
+            hint={mode === "create" ? "💡 สามารถใช้อีเมล @gmail.com หรือ Google Workspace เพื่อให้ผู้ใช้ล็อกอินผ่านปุ่ม Google ได้ทันที" : undefined}
+          >
             <input id="user-email" type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} required disabled={mode === "edit"} />
           </LiyonField>
           <LiyonField label={t("users.roles")} hint={isSelf ? t("users.cannotEditSelf") : t("users.rolesHint")}>
