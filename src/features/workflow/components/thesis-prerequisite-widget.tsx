@@ -6,9 +6,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   XCircle,
-  FileCheck,
-  BookOpen,
-  Award,
 } from "lucide-react";
 import { useT } from "@/shared/lib/i18n/client";
 import {
@@ -17,7 +14,6 @@ import {
   type EnglishTestType,
   type PublicationType,
   type ThesisPrerequisitesResult,
-  ENGLISH_MIN_SCORES,
 } from "../_internal/services/prerequisite.service";
 
 interface ThesisPrerequisiteWidgetProps {

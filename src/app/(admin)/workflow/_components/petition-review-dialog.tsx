@@ -29,6 +29,7 @@ import {
   type PetitionDto,
   type PetitionActivityDto,
   ThesisPrerequisiteWidget,
+  DefenseEvaluationWidget,
 } from "@/features/workflow";
 import { processPetitionActionMutation } from "@/features/workflow/actions";
 import { AdvisoryFeedbackAiWidget } from "@/features/ai";
@@ -296,6 +297,22 @@ export function PetitionReviewDialog({
           {/* Thesis Defense Pre-requisite Summary for Committee */}
           {petition.type === "DEFENSE_EXAM_REQUEST" && (
             <ThesisPrerequisiteWidget readOnly={true} />
+          )}
+
+          {/* Committee Evaluation & Scoring Panel */}
+          {(petition.type === "DEFENSE_EXAM_REQUEST" ||
+            petition.type === "THESIS_TOPIC_APPROVAL") && (
+            <DefenseEvaluationWidget
+              petitionType={petition.type}
+              thesisTitle={petition.thesisTitleTh || petition.title}
+              studentName={petition.studentName}
+              advisorName={petition.advisorNameTh || undefined}
+              readOnly={isFinalized || !canManage}
+              onApplyVerdict={(summary, suggestedAction) => {
+                setComment((prev) => (prev ? `${prev}\n\n${summary}` : summary));
+                setAction(suggestedAction);
+              }}
+            />
           )}
 
           {/* Description & Justification */}

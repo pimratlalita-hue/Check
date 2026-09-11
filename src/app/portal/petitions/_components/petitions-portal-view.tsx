@@ -30,6 +30,7 @@ import {
   trackPublicPetitionAction,
 } from "@/features/workflow/actions";
 import { ThesisTitleAiWidget, ConceptNoteSummarizerWidget } from "@/features/ai";
+import { DocumentUploadDropzone } from "@/components/documents/document-upload-dropzone";
 
 interface ProgramOption {
   id: string;
@@ -535,18 +536,12 @@ export function PetitionsPortalView({ programs, advisors }: PetitionsPortalViewP
                     />
                   </div>
 
-                  <div>
-                    <label className="block font-medium text-slate-700 mb-1">
-                      {t("workflow.attachment")} (URL หรือ Cloud Storage Link)
-                    </label>
-                    <input
-                      type="url"
-                      value={attachmentUrl}
-                      onChange={(e) => setAttachmentUrl(e.target.value)}
-                      placeholder="เช่น https://drive.google.com/... หรือ https://storage.univ.ac.th/..."
-                      className="w-full px-3 py-2 bg-white border border-slate-300 rounded-lg text-xs focus:ring-2 focus:ring-rose-500 focus:outline-none"
-                    />
-                  </div>
+                  <DocumentUploadDropzone
+                    value={attachmentUrl}
+                    onChange={setAttachmentUrl}
+                    label="เอกสารประกอบคำร้อง / ร่างเค้าโครงวิทยานิพนธ์ (Thesis Attachment)"
+                    description="รองรับไฟล์ .pdf, .docx, .doc สูงสุด 50 MB พร้อมระบบตรวจสอบความถูกต้อง"
+                  />
                 </div>
               </div>
 

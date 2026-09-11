@@ -2,7 +2,6 @@ import { describe, it, expect } from "vitest";
 import {
   evaluateThesisPrerequisites,
   checkThesisPrerequisitesInputSchema,
-  ENGLISH_MIN_SCORES,
 } from "./prerequisite.service";
 
 describe("Thesis Defense Pre-requisite Service Tests", () => {

@@ -6,6 +6,7 @@ import { RoleSwitcher } from "@/components/layout/role-switcher";
 import { getLocale, getT } from "@/i18n/server";
 import { Button } from "@/components/ui/button";
 import { resolveTenantInfo } from "@/features/identity/server";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 export default async function PortalLayout({
   children,
@@ -124,6 +125,7 @@ export default async function PortalLayout({
             </Link>
 
             <div className="pl-2 border-l border-slate-200 flex items-center gap-2">
+              <NotificationBell />
               <RoleSwitcher />
               <ProjectorModeToggle />
               <LanguageSwitcher />

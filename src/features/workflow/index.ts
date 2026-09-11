@@ -32,5 +32,8 @@ export {
   type ThesisPrerequisitesResult,
 } from "./_internal/services/prerequisite.service";
 export { ThesisPrerequisiteWidget } from "./components/thesis-prerequisite-widget";
+export { DefenseEvaluationWidget } from "./components/defense-evaluation-widget";
+export type { SystemNotification, NotificationType } from "./_internal/services/notification.service";
+export type { StoredDocumentMetadata } from "./_internal/services/document-storage.service";
 
 

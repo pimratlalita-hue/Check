@@ -1,0 +1,47 @@
+[
+  {
+    "type": "PETITION_SUBMITTED",
+    "title": "ยื่นคำร้องสอบปากเปล่าวิทยานิพนธ์ (Verification Test)",
+    "message": "นิสิต พระมหาดุษฎี ธีรปัญโญ ได้ยื่นคำร้อง REQ-2026-TEST",
+    "trackingNo": "REQ-2026-TEST",
+    "recipientRole": "ADVISOR",
+    "recipientEmail": "advisor@mcu.ac.th",
+    "linkUrl": "/workflow",
+    "id": "notif_e2b00a73-cda8-4b8d-a658-250297bfb138",
+    "isRead": true,
+    "createdAt": "2026-09-11T15:20:07.612Z"
+  },
+  {
+    "type": "PETITION_SUBMITTED",
+    "title": "ยื่นคำร้องสอบปากเปล่าวิทยานิพนธ์ (Verification Test)",
+    "message": "นิสิต พระมหาดุษฎี ธีรปัญโญ ได้ยื่นคำร้อง REQ-2026-TEST",
+    "trackingNo": "REQ-2026-TEST",
+    "recipientRole": "ADVISOR",
+    "recipientEmail": "advisor@mcu.ac.th",
+    "linkUrl": "/workflow",
+    "id": "notif_74860ec6-f938-4d9c-982a-7ea39742ac7d",
+    "isRead": true,
+    "createdAt": "2026-09-11T15:19:57.798Z"
+  },
+  {
+    "id": "notif_seed_1",
+    "type": "PETITION_SUBMITTED",
+    "title": "มีคำร้องขออนุมัติหัวข้อวิทยานิพนธ์ใหม่",
+    "message": "นายมานะ มุ่งมั่น (65010001) ได้ยื่นคำร้อง REQ-2026-0001 รอการพิจารณา",
+    "trackingNo": "REQ-2026-0001",
+    "recipientRole": "ADVISOR",
+    "linkUrl": "/workflow",
+    "isRead": false,
+    "createdAt": "2026-09-11T14:19:57.798Z"
+  },
+  {
+    "id": "notif_seed_2",
+    "type": "EXAM_SCHEDULED",
+    "title": "แจ้งเตือนกำหนดการสอบเค้าโครงวิทยานิพนธ์",
+    "message": "นัดหมายสอบห้อง Smart Defense Room 101 ในวันศุกร์นี้ เวลา 09:00 น.",
+    "recipientRole": "ALL",
+    "linkUrl": "/facility",
+    "isRead": false,
+    "createdAt": "2026-09-11T13:19:57.798Z"
+  }
+]

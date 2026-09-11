@@ -12,4 +12,8 @@ e2e/.auth/
 .DS_Store
 .superpowers/
 public/test-reports/
+storage/backups/*.sql.gz
+storage/uploads/documents/*
+!storage/uploads/documents/.gitkeep
+!storage/backups/.gitkeep
 

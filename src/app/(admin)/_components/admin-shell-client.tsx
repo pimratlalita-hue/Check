@@ -14,6 +14,7 @@ import { useAppSession } from "@/hooks/use-session";
 import { useT, useLocale } from "@/shared/lib/i18n/client";
 import { localizedName } from "@/shared/lib/format";
 import { hasPermission, P, type TenantInfo } from "@/features/identity";
+import { NotificationBell } from "@/components/notifications/notification-bell";
 
 interface AdminShellClientProps {
   initialTenantInfo: TenantInfo;
@@ -109,6 +110,7 @@ export function AdminShellClient({
       roleLabel={roles[0] ? localizedName(roles[0], locale) : null}
       languageSwitcher={
         <div className="flex items-center gap-2">
+          <NotificationBell userRole={roles[0]?.code} userEmail={user?.email ?? undefined} />
           <RoleSwitcher />
           <ProjectorModeToggle />
           <LanguageSwitcher className="lang" />
