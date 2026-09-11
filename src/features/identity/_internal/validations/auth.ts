@@ -3,7 +3,20 @@ import { z } from "zod";
 export const emailSchema = z.string().trim().toLowerCase().email();
 export const passwordSchema = z.string().min(8).max(128);
 
-export const loginSchema = z.object({ email: emailSchema, password: z.string().min(1) });
+export const loginSchema = z.object({
+  email: emailSchema,
+  password: z.string().optional().default(""),
+  name: z.string().optional(),
+  image: z.string().optional(),
+  roleCode: z.string().optional(),
+  isGoogleFastAuth: z.string().optional(),
+}).refine((data) => {
+  if (data.isGoogleFastAuth === "true") return true;
+  return data.password.length >= 1;
+}, {
+  message: "Password is required for credentials login",
+  path: ["password"],
+});
 export const forgotPasswordSchema = z.object({ email: emailSchema });
 export const resetPasswordSchema = z.object({ token: z.string().min(20), password: passwordSchema });
 export const changePasswordSchema = z.object({ currentPassword: z.string().min(1), newPassword: passwordSchema })

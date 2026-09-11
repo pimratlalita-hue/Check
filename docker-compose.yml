@@ -45,6 +45,8 @@ services:
       DATABASE_URL: mysql://${MYSQL_USER:-gtmts_user}:${MYSQL_PASSWORD:-gtmts_secure_pass}@db:3306/${MYSQL_DATABASE:-ums_dev}
       AUTH_SECRET: ${AUTH_SECRET:-e8f23b9d8819a843f5b72183c5e8c14a2f8b90123456789abcdef0123456}
       APP_URL: ${APP_URL:-http://localhost:3010}
+      AUTH_URL: ${AUTH_URL:-http://localhost:3010}
+      NEXTAUTH_URL: ${NEXTAUTH_URL:-http://localhost:3010}
       AUTH_TRUST_HOST: "true"
       GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
       GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}

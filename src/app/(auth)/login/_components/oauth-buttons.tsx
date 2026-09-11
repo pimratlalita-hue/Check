@@ -1,8 +1,11 @@
 "use client";
+
+import { useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import { useT } from "@/shared/lib/i18n/client";
 import { safeCallbackUrl } from "@/shared/lib/security/callback-url";
+import { GoogleSignInModal } from "./google-signin-modal";
 
 const PROVIDER_ID = { google: "google", microsoft: "microsoft-entra-id" } as const;
 
@@ -34,20 +37,35 @@ export function OAuthButtons({ providers }: { providers: ("google" | "microsoft"
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl");
   const target = safeCallbackUrl(callbackUrl);
+  const [googleModalOpen, setGoogleModalOpen] = useState(false);
 
   return (
-    <div className="oauth">
-      {providers.map((p) => (
-        <button
-          key={p}
-          type="button"
-          className="btn-oauth inline-flex items-center justify-center gap-1"
-          onClick={() => signIn(PROVIDER_ID[p], { callbackUrl: target })}
-        >
-          {p === "google" && <GoogleLogo />}
-          <span>{t(`auth.provider.${p}`)}</span>
-        </button>
-      ))}
-    </div>
+    <>
+      <div className="oauth">
+        {providers.map((p) => (
+          <button
+            key={p}
+            type="button"
+            className="btn-oauth inline-flex items-center justify-center gap-1 cursor-pointer"
+            onClick={() => {
+              if (p === "google") {
+                setGoogleModalOpen(true);
+              } else {
+                signIn(PROVIDER_ID[p], { callbackUrl: target });
+              }
+            }}
+          >
+            {p === "google" && <GoogleLogo />}
+            <span>{t(`auth.provider.${p}`)}</span>
+          </button>
+        ))}
+      </div>
+
+      <GoogleSignInModal
+        isOpen={googleModalOpen}
+        onClose={() => setGoogleModalOpen(false)}
+        callbackUrl={target || "/portal/news"}
+      />
+    </>
   );
 }

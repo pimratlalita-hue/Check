@@ -16,6 +16,8 @@ import {
   Globe,
   Sparkles,
   Image as ImageIcon,
+  Copy,
+  Key,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LiyonCard, LiyonField, PalettePicker } from "@/shared/components/liyon";
@@ -504,6 +506,109 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
                   <span>{testResult.message}</span>
                 </div>
               )}
+            </div>
+          </div>
+        </LiyonCard>
+
+        {/* 2.5 การเข้าสู่ระบบด้วย Google & OAuth 2.0 */}
+        <LiyonCard>
+          <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-4">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 bg-blue-50 border border-blue-200 rounded-xl">
+                <svg className="w-5 h-5" viewBox="0 0 24 24">
+                  <path fill="#4285F4" d="M23.745 12.27c0-.7-.06-1.4-.19-2.07H12v4.51h6.6c-.29 1.52-1.14 2.82-2.4 3.68v3.05h3.88c2.27-2.09 3.665-5.17 3.665-9.17Z" />
+                  <path fill="#34A853" d="M12 24c3.24 0 5.95-1.08 7.93-2.91l-3.88-3.05c-1.08.72-2.45 1.16-4.05 1.16-3.12 0-5.77-2.1-6.72-4.93H1.25v3.15C3.26 21.36 7.33 24 12 24Z" />
+                  <path fill="#FBBC05" d="M5.28 14.27c-.25-.72-.38-1.49-.38-2.27s.13-1.55.38-2.27V6.58H1.25C.45 8.18 0 9.98 0 12s.45 3.82 1.25 5.42l4.03-3.15Z" />
+                  <path fill="#EA4335" d="M12 4.75c1.77 0 3.35.61 4.6 1.8l3.42-3.42C17.95 1.19 15.24 0 12 0 7.33 0 3.26 2.64 1.25 6.58l4.03 3.15c.95-2.83 3.6-4.98 6.72-4.98Z" />
+                </svg>
+              </div>
+              <div>
+                <h2 className="text-base font-bold text-slate-900">การเข้าสู่ระบบด้วย Google (Google Sign-In & OAuth 2.0)</h2>
+                <p className="text-xs text-slate-500">ตั้งค่าและตรวจสอบสถานะระบบยืนยันตัวตนด้วย Google และการสร้างบัญชีอัตโนมัติ (Auto-Provisioning)</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-full">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+              เปิดใช้งานแล้ว (Active)
+            </span>
+          </div>
+
+          <div className="space-y-4">
+            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-3">
+              <div className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <Sparkles className="w-4 h-4 text-blue-600" />
+                คุณสมบัติของระบบเข้าสู่ระบบ Google ในปัจจุบัน:
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs text-slate-600">
+                <div className="flex items-start gap-2 bg-white p-2.5 rounded-lg border border-slate-200/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>Auto-Provisioning:</strong> เมื่อนิสิตหรืออาจารย์ล็อกอินด้วย Google ระบบจะสร้างบัญชีและผูกสิทธิ์องค์กรให้อัตโนมัติ</span>
+                </div>
+                <div className="flex items-start gap-2 bg-white p-2.5 rounded-lg border border-slate-200/80">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+                  <span><strong>Google Account Chooser:</strong> หน้าต่างเลือกบัญชีตัวอย่าง มจร. 5 สไตล์ หรือพิมพ์ Gmail ใด ๆ เข้าทดสอบได้ทันที</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <div className="text-xs font-bold text-slate-800">
+                ข้อมูลสำหรับการนำไปใส่ใน Google Cloud Console (APIs & Services &gt; Credentials):
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Authorized Redirect URI (URI เปลี่ยนเส้นทางที่ได้รับอนุญาต):
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value="http://localhost:3010/api/auth/callback/google"
+                    className="w-full text-xs font-mono bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 select-all"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 gap-1 text-xs cursor-pointer"
+                    onClick={() => {
+                      navigator.clipboard.writeText("http://localhost:3010/api/auth/callback/google");
+                      toast.success("คัดลอก Redirect URI แล้ว");
+                    }}
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    คัดลอก
+                  </Button>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 mb-1">
+                  Authorized JavaScript Origin (ต้นทาง JavaScript ที่ได้รับอนุญาต):
+                </label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value="http://localhost:3010"
+                    className="w-full text-xs font-mono bg-slate-100 border border-slate-300 rounded-lg px-3 py-2 text-slate-800 select-all"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0 gap-1 text-xs cursor-pointer"
+                    onClick={() => {
+                      navigator.clipboard.writeText("http://localhost:3010");
+                      toast.success("คัดลอก Origin แล้ว");
+                    }}
+                  >
+                    <Copy className="w-3.5 h-3.5" />
+                    คัดลอก
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </LiyonCard>
