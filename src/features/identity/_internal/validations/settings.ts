@@ -23,7 +23,7 @@ export const updateSettingsSchema = z.object({
   logoUrl: z
     .string()
     .trim()
-    .max(1000)
+    .max(500_000)
     .refine(
       (val) => val === "" || val.startsWith("/") || /^https?:\/\//i.test(val) || val.startsWith("data:image/"),
       { message: "Invalid URL or path" }

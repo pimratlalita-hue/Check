@@ -12,6 +12,10 @@ import {
   Loader2,
   ExternalLink,
   ShieldCheck,
+  Upload,
+  Globe,
+  Sparkles,
+  Image as ImageIcon,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LiyonCard, LiyonField, PalettePicker } from "@/shared/components/liyon";
@@ -19,6 +23,8 @@ import { useT } from "@/shared/lib/i18n/client";
 import type { PaletteId } from "@/shared/lib/palette";
 import type { TenantSettings, SmtpSettings } from "@/features/identity";
 import { updateSettingsAction, testGmailSmtpAction } from "@/features/identity/actions";
+import { LogoEditorModal } from "./logo-editor-modal";
+import { GlobalOrgPresetsModal } from "./global-org-presets-modal";
 
 export function SettingsForm({ initial }: { initial: TenantSettings }) {
   const t = useT();
@@ -39,6 +45,10 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
   const [pending, start] = useTransition();
+
+  // Modals
+  const [logoModalOpen, setLogoModalOpen] = useState(false);
+  const [presetsModalOpen, setPresetsModalOpen] = useState(false);
 
   // Test Email States
   const [testRecipient, setTestRecipient] = useState("");
@@ -170,9 +180,9 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
               hint={t("common.optional")}
               error={errors.logoUrl?.[0]}
             >
-              <div className="space-y-2">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-lg border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
+              <div className="space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center gap-3 p-3 bg-slate-50/70 rounded-xl border border-slate-200/80">
+                  <div className="h-16 w-16 rounded-xl border border-slate-200 bg-white flex items-center justify-center overflow-hidden shrink-0 shadow-xs">
                     {form.logoUrl ? (
                       <img
                         src={form.logoUrl}
@@ -183,38 +193,82 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
                         }}
                       />
                     ) : (
-                      <span className="text-xs text-slate-400 font-medium">ไม่มี</span>
+                      <span className="text-xs text-slate-400 font-medium">ไม่มีภาพ</span>
                     )}
                   </div>
+                  <div className="flex-1 space-y-1.5">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setLogoModalOpen(true)}
+                        className="gap-2 text-xs font-semibold bg-white border-rose-300 text-rose-700 hover:bg-rose-50 shadow-2xs h-9"
+                      >
+                        <Upload className="h-4 w-4 text-rose-600" />
+                        <span>{t("settings.logoUploadBtn")}</span>
+                      </Button>
+                      {form.logoUrl && (
+                        <button
+                          type="button"
+                          onClick={() => setForm({ ...form, logoUrl: "" })}
+                          className="text-xs text-slate-500 hover:text-rose-600 underline font-medium"
+                        >
+                          ล้างโลโก้ (ใช้ค่าเริ่มต้น)
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-2xs text-slate-500 m-0">
+                      {t("settings.logoUploadDesc")}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Direct URL / Path input fallback */}
+                <div className="flex flex-col sm:flex-row sm:items-center gap-2 pt-1">
                   <input
                     id="s-logo"
-                    placeholder="https://... หรือ /faculty-logo.svg"
+                    placeholder="https://... หรือ /faculty-logo.svg หรือ data:image/..."
                     value={form.logoUrl}
                     onChange={(e) => setForm({ ...form, logoUrl: e.target.value })}
-                    className="flex-1"
+                    className="flex-1 text-xs font-mono"
                   />
-                </div>
-                <div className="flex flex-wrap items-center gap-2 text-xs">
-                  <span className="text-slate-400">ตัวเลือกด่วน:</span>
                   <button
                     type="button"
                     onClick={() => setForm({ ...form, logoUrl: "/faculty-logo.svg" })}
-                    className="text-rose-600 hover:text-rose-700 underline font-medium"
+                    className="text-2xs text-rose-600 hover:text-rose-700 underline font-medium whitespace-nowrap"
                   >
                     ใช้ตราสัญลักษณ์คณะตัวอย่าง (/faculty-logo.svg)
                   </button>
-                  {form.logoUrl && (
-                    <button
-                      type="button"
-                      onClick={() => setForm({ ...form, logoUrl: "" })}
-                      className="text-slate-500 hover:text-slate-700 underline ml-2"
-                    >
-                      ล้างโลโก้ (ใช้ไอคอนเริ่มต้น)
-                    </button>
-                  )}
                 </div>
               </div>
             </LiyonField>
+
+            {/* ปุ่มแก้ไขข้อความองค์กรแบบมาตรฐานโลก (Global Standard Organization Presets) */}
+            <div className="pt-4 mt-2 border-t border-slate-200/80">
+              <div className="p-4 rounded-xl bg-gradient-to-r from-rose-50/70 via-slate-50 to-rose-50/40 border border-rose-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <div className="p-1.5 rounded-lg bg-rose-600 text-white shadow-2xs">
+                      <Globe className="h-4 w-4" />
+                    </div>
+                    <h3 className="text-xs font-bold text-slate-900 m-0">
+                      {t("settings.globalPresetsBtn")}
+                    </h3>
+                  </div>
+                  <p className="text-2xs text-slate-600 m-0 leading-relaxed max-w-xl">
+                    {t("settings.globalPresetsDesc")}
+                  </p>
+                </div>
+                <Button
+                  type="button"
+                  onClick={() => setPresetsModalOpen(true)}
+                  className="gap-2 text-xs font-semibold whitespace-nowrap shrink-0 shadow-xs h-9 bg-rose-600 hover:bg-rose-700 text-white"
+                >
+                  <Sparkles className="h-3.5 w-3.5" />
+                  <span>{t("settings.globalPresetsBtn")}</span>
+                </Button>
+              </div>
+            </div>
           </div>
         </LiyonCard>
 
@@ -477,6 +531,30 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
           </Button>
         </div>
       </div>
+
+      {/* Logo Editor Modal */}
+      <LogoEditorModal
+        open={logoModalOpen}
+        onOpenChange={setLogoModalOpen}
+        currentLogoUrl={form.logoUrl}
+        onApplyLogo={(newLogo) => {
+          setForm((prev) => ({ ...prev, logoUrl: newLogo }));
+          toast.success("ปรับแต่งโลโก้เรียบร้อยแล้ว กรุณากดปุ่มบันทึกการตั้งค่าเพื่อนำไปใช้งานทั้งระบบ");
+        }}
+      />
+
+      {/* Global Standard Organization Presets Modal */}
+      <GlobalOrgPresetsModal
+        open={presetsModalOpen}
+        onOpenChange={setPresetsModalOpen}
+        currentNameTh={form.nameTh}
+        currentNameEn={form.nameEn}
+        currentLogoUrl={form.logoUrl}
+        onApply={(th, en) => {
+          setForm((prev) => ({ ...prev, nameTh: th, nameEn: en }));
+          toast.success("นำเทมเพลตชื่อองค์กรมาตรฐานสากลไปใช้งานแล้ว กรุณากดปุ่มบันทึกการตั้งค่า");
+        }}
+      />
     </>
   );
 }

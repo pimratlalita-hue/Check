@@ -60,11 +60,14 @@ export default async function PortalLayout({
                 <GraduationCap className="h-6 w-6" />
               )}
             </div>
-            <div>
-              <div className="font-bold text-base sm:text-lg tracking-tight text-slate-900 leading-tight">
+            <div className="max-w-[180px] sm:max-w-[260px] md:max-w-[320px] lg:max-w-md">
+              <div
+                className="font-bold text-sm sm:text-base tracking-tight text-slate-900 leading-tight truncate"
+                title={orgName}
+              >
                 {orgName}
               </div>
-              <div className="text-xs text-rose-600 font-medium">
+              <div className="text-2xs sm:text-xs text-rose-600 font-medium truncate">
                 {locale === "en" ? "Public Portal & Knowledge Center" : "ศูนย์ข้อมูลข่าวสารและประชาสัมพันธ์"}
               </div>
             </div>
