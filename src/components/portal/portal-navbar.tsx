@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -28,6 +28,54 @@ interface PortalNavbarProps {
   utilities?: React.ReactNode;
 }
 
+function parseOrgTitle(name: string, isEn: boolean) {
+  const trimmed = (name || "").trim();
+  if (!trimmed) {
+    return {
+      primary: isEn ? "Dept. of Foreign Languages" : "ภาควิชาภาษาต่างประเทศ",
+      secondary: isEn ? "Faculty of Humanities, MCU" : "คณะมนุษยศาสตร์ มจร",
+    };
+  }
+  if (trimmed.includes("\n")) {
+    const [p, ...rest] = trimmed.split("\n");
+    return { primary: p.trim(), secondary: rest.join(" ").trim() };
+  }
+  if (trimmed.includes(" / ")) {
+    const [p, ...rest] = trimmed.split(" / ");
+    return { primary: p.trim(), secondary: rest.join(" / ").trim() };
+  }
+  if (trimmed.includes(" - ")) {
+    const [p, ...rest] = trimmed.split(" - ");
+    return { primary: p.trim(), secondary: rest.join(" - ").trim() };
+  }
+  if (trimmed.includes(" • ")) {
+    const [p, ...rest] = trimmed.split(" • ");
+    return { primary: p.trim(), secondary: rest.join(" • ").trim() };
+  }
+  if (!isEn && trimmed.includes(" คณะ")) {
+    const idx = trimmed.indexOf(" คณะ");
+    return {
+      primary: trimmed.substring(0, idx).trim(),
+      secondary: trimmed.substring(idx).trim(),
+    };
+  }
+  if (trimmed.includes(", ")) {
+    const [p, ...rest] = trimmed.split(", ");
+    return { primary: p.trim(), secondary: rest.join(", ").trim() };
+  }
+  if (isEn && trimmed.includes(" Faculty")) {
+    const idx = trimmed.indexOf(" Faculty");
+    return {
+      primary: trimmed.substring(0, idx).trim(),
+      secondary: trimmed.substring(idx).trim(),
+    };
+  }
+  return {
+    primary: trimmed,
+    secondary: isEn ? "Graduate Thesis & Research Ecosystem" : "ระบบบริหารจัดการวิทยานิพนธ์",
+  };
+}
+
 export function PortalNavbar({
   logoUrl,
   orgNameTh,
@@ -40,15 +88,33 @@ export function PortalNavbar({
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [servicesDropdownOpen, setServicesDropdownOpen] = useState(false);
 
-  const isEn = locale === "en";
+  // Dynamic organization state synced with props & instant events
+  const [currentNameTh, setCurrentNameTh] = useState(orgNameTh || "");
+  const [currentNameEn, setCurrentNameEn] = useState(orgNameEn || "");
+  const [currentLogoUrl, setCurrentLogoUrl] = useState(logoUrl || null);
 
-  // Academic identity labels
-  const primaryTitle = isEn
-    ? "Dept. of Foreign Languages"
-    : "ภาควิชาภาษาต่างประเทศ";
-  const secondaryTitle = isEn
-    ? "Faculty of Humanities, MCU"
-    : "คณะมนุษยศาสตร์ มจร";
+  useEffect(() => {
+    setCurrentNameTh(orgNameTh || "");
+    setCurrentNameEn(orgNameEn || "");
+    setCurrentLogoUrl(logoUrl || null);
+  }, [orgNameTh, orgNameEn, logoUrl]);
+
+  useEffect(() => {
+    function handleUpdate(e: Event) {
+      const customEvent = e as CustomEvent<Partial<{ nameTh: string; nameEn: string; logoUrl: string | null }>>;
+      if (customEvent.detail) {
+        if (customEvent.detail.nameTh !== undefined) setCurrentNameTh(customEvent.detail.nameTh);
+        if (customEvent.detail.nameEn !== undefined) setCurrentNameEn(customEvent.detail.nameEn);
+        if (customEvent.detail.logoUrl !== undefined) setCurrentLogoUrl(customEvent.detail.logoUrl);
+      }
+    }
+    window.addEventListener("tenant-info-updated", handleUpdate);
+    return () => window.removeEventListener("tenant-info-updated", handleUpdate);
+  }, []);
+
+  const isEn = locale === "en";
+  const activeOrgName = isEn ? (currentNameEn || currentNameTh) : (currentNameTh || currentNameEn);
+  const titleInfo = parseOrgTitle(activeOrgName, isEn);
 
   const navLinks = [
     {
@@ -135,10 +201,10 @@ export function PortalNavbar({
           >
             <div className="h-11 w-11 sm:h-12 sm:w-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-rose-600 to-pink-500 p-0.5 shadow-md shadow-rose-500/15 group-hover:scale-105 transition-all duration-300 shrink-0">
               <div className="h-full w-full bg-white rounded-[14px] flex items-center justify-center overflow-hidden p-0.5">
-                {logoUrl ? (
+                {currentLogoUrl ? (
                   <img
-                    src={logoUrl}
-                    alt={orgNameTh || primaryTitle}
+                    src={currentLogoUrl}
+                    alt={activeOrgName}
                     className="h-full w-full object-contain"
                   />
                 ) : (
@@ -147,13 +213,15 @@ export function PortalNavbar({
               </div>
             </div>
 
-            <div className="flex flex-col min-w-0">
+            <div className="flex flex-col min-w-0" title={activeOrgName}>
               <span className="font-extrabold text-sm sm:text-base tracking-tight text-slate-900 group-hover:text-rose-600 transition-colors truncate">
-                {primaryTitle}
+                {titleInfo.primary}
               </span>
-              <span className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
-                {secondaryTitle}
-              </span>
+              {titleInfo.secondary && (
+                <span className="text-[11px] sm:text-xs text-slate-500 font-medium truncate">
+                  {titleInfo.secondary}
+                </span>
+              )}
             </div>
           </Link>
 

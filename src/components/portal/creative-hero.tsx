@@ -34,7 +34,7 @@ export function CreativeHero({
   // Dynamic department display
   const departmentLabel = isEn
     ? (tenantNameEn || "Department of Foreign Languages, Faculty of Humanities, MCU")
-    : "ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์";
+    : (tenantNameTh || "ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์");
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
