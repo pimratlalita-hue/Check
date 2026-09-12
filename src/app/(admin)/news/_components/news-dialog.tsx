@@ -16,8 +16,15 @@ import {
 } from "@/shared/components/liyon";
 import { Button } from "@/components/ui/button";
 import { generateEnglishNewsAction } from "@/features/news/actions";
+import { TinyEditor } from "./tiny-editor";
 import type { NewsFormData } from "./types";
 import type { NewsCategory, NewsStatus } from "@/features/news";
+
+function isHtmlEmpty(html: string): boolean {
+  if (!html) return true;
+  const text = html.replace(/<[^>]*>/g, "").replace(/&nbsp;/g, " ").trim();
+  return text.length === 0 && !html.includes("<img");
+}
 
 interface NewsDialogProps {
   open: boolean;
@@ -66,7 +73,7 @@ export function NewsDialog({
       toast.error("กรุณากรอกหัวข้อข่าวภาษาไทยก่อนใช้งาน AI");
       return;
     }
-    if (!form.contentTh.trim()) {
+    if (isHtmlEmpty(form.contentTh)) {
       toast.error("กรุณากรอกเนื้อหาข่าวภาษาไทยก่อนใช้งาน AI");
       return;
     }
@@ -117,8 +124,8 @@ export function NewsDialog({
     if (!form.titleTh.trim()) errs.titleTh = t("error.required");
     if (!form.titleEn.trim()) errs.titleEn = t("error.required");
     if (!form.slug.trim()) errs.slug = t("error.required");
-    if (!form.contentTh.trim()) errs.contentTh = t("error.required");
-    if (!form.contentEn.trim()) errs.contentEn = t("error.required");
+    if (isHtmlEmpty(form.contentTh)) errs.contentTh = t("error.required");
+    if (isHtmlEmpty(form.contentEn)) errs.contentEn = t("error.required");
     setErrors(errs);
     return Object.keys(errs).length === 0;
   };
@@ -315,26 +322,30 @@ export function NewsDialog({
             </div>
 
             {/* Full Contents */}
-            <div className="space-y-3">
-              <LiyonField label={t("news.contentTh")} error={errors.contentTh}>
-                <textarea
-                  rows={6}
+            <div className="space-y-4">
+              <LiyonField
+                label={t("news.contentTh")}
+                error={errors.contentTh}
+                hint="จัดรูปแบบเนื้อหาด้วย Tiny Editor (ตัวหนา ตัวเอียง ตาราง รายการ และลิงก์)"
+              >
+                <TinyEditor
                   value={form.contentTh}
-                  onChange={(e) => setForm((prev) => ({ ...prev, contentTh: e.target.value }))}
-                  placeholder="เนื้อหาข่าวฉบับเต็มภาษาไทย (รองรับ Markdown)..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm font-mono"
-                  required
+                  onChange={(val) => setForm((prev) => ({ ...prev, contentTh: val }))}
+                  placeholder="พิมพ์หรือจัดรูปแบบเนื้อหาข่าวฉบับเต็มภาษาไทยที่นี่..."
+                  height={300}
                 />
               </LiyonField>
 
-              <LiyonField label={t("news.contentEn")} error={errors.contentEn}>
-                <textarea
-                  rows={6}
+              <LiyonField
+                label={t("news.contentEn")}
+                error={errors.contentEn}
+                hint="เนื้อหาภาษาอังกฤษ (สร้างอัตโนมัติด้วย AI หรือแก้ไขด้วย Tiny Editor ได้โดยตรง)"
+              >
+                <TinyEditor
                   value={form.contentEn}
-                  onChange={(e) => setForm((prev) => ({ ...prev, contentEn: e.target.value }))}
-                  placeholder="Full news content in English (Markdown supported)..."
-                  className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm font-mono"
-                  required
+                  onChange={(val) => setForm((prev) => ({ ...prev, contentEn: val }))}
+                  placeholder="Full news content in English (Markdown/HTML supported)..."
+                  height={260}
                 />
               </LiyonField>
             </div>

@@ -11,6 +11,7 @@ const PUBLIC_PREFIXES = [
   "/api/notifications",
   "/api/documents/",
   "/documents/",
+  "/tinymce/",
   "/_next/",
   "/favicon.ico",
 ];

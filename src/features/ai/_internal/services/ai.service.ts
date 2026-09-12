@@ -273,7 +273,7 @@ ${input.contentTh}
 Instructions:
 1. "titleEn": Translate into an engaging, clear English headline using Title Case.
 2. "summaryEn": Provide a concise, clear 1-2 sentence executive summary in English (suitable for social previews and listing cards). If the Thai summary is empty, summarize the key essence from the Thai content.
-3. "contentEn": Translate the full content into fluent, idiomatic English. Preserve all Markdown formatting (headings like ##, lists -, *, bold **, blockquotes >, links, tables, paragraphs) intact.
+3. "contentEn": Translate the full content into fluent, idiomatic English. If the input contains HTML tags (such as <p>, <strong>, <em>, <ul>, <ol>, <li>, <table>, <tr>, <td>, <th>, <a>, <h2>, <h3>), preserve all HTML tags and document structure intact in contentEn. If the input is markdown, preserve markdown formatting.
 4. "slug": Generate a clean, SEO-friendly English URL slug based on the English title (lowercase letters, numbers, hyphens only, 3-6 words, e.g. "mcu-orientation-ceremony-2026").
 
 Respond STRICTLY with a valid JSON object matching this schema without markdown codeblocks or extra text:
@@ -334,7 +334,10 @@ function getFallbackEnglishNews(input: GenerateEnglishNewsInput): GeneratedEngli
     ? `Graduate School, Mahachulalongkornrajavidyalaya University (MCU) announces: ${titleEn}. All graduate students and faculty members are cordially invited.`
     : `Official announcement regarding ${titleEn} by the Graduate School, Mahachulalongkornrajavidyalaya University.`;
 
-  const contentEn = `## ${titleEn}\n\nThe Graduate School of Mahachulalongkornrajavidyalaya University (MCU) cordially announces the following official press release for graduate students, faculty members, and researchers:\n\n${input.contentTh}\n\n---\n*For further inquiries, please contact the Graduate School Administration Office.*`;
+  const hasHtml = /<[a-z][\s\S]*>/i.test(input.contentTh);
+  const contentEn = hasHtml
+    ? `<h2>${titleEn}</h2><p>The Graduate School of Mahachulalongkornrajavidyalaya University (MCU) cordially announces the following official press release:</p>${input.contentTh}<hr/><p><em>For further inquiries, please contact the Graduate School Administration Office.</em></p>`
+    : `## ${titleEn}\n\nThe Graduate School of Mahachulalongkornrajavidyalaya University (MCU) cordially announces the following official press release for graduate students, faculty members, and researchers:\n\n${input.contentTh}\n\n---\n*For further inquiries, please contact the Graduate School Administration Office.*`;
 
   return {
     titleEn,

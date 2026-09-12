@@ -154,9 +154,16 @@ export default async function NewsDetailPage({ params }: PageProps) {
       )}
 
       {/* Full Content */}
-      <div className="prose prose-slate max-w-none text-slate-800 text-base leading-relaxed space-y-4 whitespace-pre-line font-normal">
-        {primaryContent}
-      </div>
+      {/<[a-z][\s\S]*>/i.test(primaryContent) ? (
+        <div
+          className="prose prose-slate max-w-none text-slate-800 text-base leading-relaxed font-normal [&_p]:mb-4 [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:mb-4 [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:mb-4 [&_li]:mb-1 [&_table]:w-full [&_table]:border-collapse [&_table]:my-4 [&_th]:border [&_th]:border-slate-200 [&_th]:bg-slate-50 [&_th]:p-2.5 [&_td]:border [&_td]:border-slate-200 [&_td]:p-2.5 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:text-slate-900 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:text-slate-900 [&_h2]:mt-6 [&_h2]:mb-3 [&_h3]:text-lg [&_h3]:font-bold [&_h3]:text-slate-800 [&_h3]:mt-4 [&_h3]:mb-2 [&_a]:text-blue-600 [&_a]:underline"
+          dangerouslySetInnerHTML={{ __html: primaryContent }}
+        />
+      ) : (
+        <div className="prose prose-slate max-w-none text-slate-800 text-base leading-relaxed space-y-4 whitespace-pre-line font-normal">
+          {primaryContent}
+        </div>
+      )}
 
       {/* File Attachments */}
       {article.attachments && article.attachments.length > 0 && (
