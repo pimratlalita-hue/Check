@@ -12,6 +12,9 @@ const PUBLIC_PREFIXES = [
   "/api/documents/",
   "/documents/",
   "/tinymce/",
+  "/icons/",
+  "/faculty-logo.svg",
+  "/manifest.webmanifest",
   "/_next/",
   "/favicon.ico",
 ];

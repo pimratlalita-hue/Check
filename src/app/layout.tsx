@@ -16,7 +16,27 @@ const sarabun = Sarabun({ variable: "--font-sarabun", subsets: ["thai", "latin"]
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getT();
-  return { title: t("app.name"), description: t("app.tagline") };
+  return {
+    title: t("app.name"),
+    description: t("app.tagline"),
+    manifest: "/manifest.webmanifest",
+    applicationName: "GTMTS",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "GTMTS",
+    },
+    formatDetection: {
+      telephone: false,
+    },
+    icons: {
+      icon: [
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
+      ],
+      apple: [{ url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" }],
+    },
+  };
 }
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
