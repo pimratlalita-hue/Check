@@ -37,8 +37,9 @@ export const sidebarGroups: NavGroup[] = [
         href: "/curriculum",
         icon: GraduationCap,
         children: [
-          { title: "curriculum.nav", href: "/curriculum", icon: GraduationCap, permission: CURRICULUM_P.curriculumRead },
-          { title: "staff.nav", href: "/staff", icon: UserCheck, permission: STAFF_P.staffRead },
+          { title: "curriculum.nav", href: "/curriculum", permission: CURRICULUM_P.curriculumRead },
+          { title: "staff.nav", href: "/staff", permission: STAFF_P.staffRead },
+          { title: "news.nav", href: "/news", permission: NEWS_P.newsRead },
         ],
       },
     ],
@@ -61,13 +62,7 @@ export const sidebarGroups: NavGroup[] = [
     ],
   },
 
-  // 4. การสื่อสารและประชาสัมพันธ์ (Communications & News)
-  {
-    label: "news.nav",
-    items: [{ title: "news.nav", href: "/news", icon: Newspaper, permission: NEWS_P.newsRead }],
-  },
-
-  // 5. ผู้ใช้งานและสิทธิ์ (Users & Access)
+  // 4. ผู้ใช้งานและสิทธิ์ (Users & Access)
   {
     label: "nav.group.users",
     items: [
@@ -84,7 +79,7 @@ export const sidebarGroups: NavGroup[] = [
     ],
   },
 
-  // 6. การตั้งค่าและการสำรองข้อมูล (Settings & Maintenance)
+  // 5. การตั้งค่าและการสำรองข้อมูล (Settings & Maintenance)
   {
     label: "nav.group.settings",
     items: [
@@ -94,16 +89,11 @@ export const sidebarGroups: NavGroup[] = [
         icon: Settings,
         children: [
           { title: "nav.settings", href: "/settings", permission: P.settingsManage },
-          { title: "backup.nav", href: "/backup", icon: DatabaseBackup, permission: BACKUP_P.backupManage },
+          { title: "backup.nav", href: "/backup", permission: BACKUP_P.backupManage },
+          { title: "sample.nav", href: "/sample", permission: SAMPLE_P.sampleRead },
         ],
       },
     ],
-  },
-
-  // 7. โมดูลตัวอย่าง (Development / Sample)
-  {
-    label: "nav.group.sample",
-    items: [{ title: "sample.nav", href: "/sample", icon: Layers, permission: SAMPLE_P.sampleRead }],
   },
 ];
 
