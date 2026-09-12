@@ -32,10 +32,11 @@ function parseOrgTitle(name: string, isEn: boolean) {
   const trimmed = (name || "").trim();
   if (!trimmed) {
     return {
-      primary: isEn ? "Dept. of Foreign Languages" : "ภาควิชาภาษาต่างประเทศ",
-      secondary: isEn ? "Faculty of Humanities, MCU" : "คณะมนุษยศาสตร์ มจร",
+      primary: isEn ? "Department of Foreign Languages, Faculty of Humanities, MCU" : "ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์ มจร",
+      secondary: isEn ? "Graduate Thesis & Research Ecosystem" : "ระบบบริหารจัดการและติดตามวิทยานิพนธ์ (GTMTS)",
     };
   }
+  // If explicitly formatted with line breaks or slashes, honor the author's structure
   if (trimmed.includes("\n")) {
     const [p, ...rest] = trimmed.split("\n");
     return { primary: p.trim(), secondary: rest.join(" ").trim() };
@@ -44,35 +45,13 @@ function parseOrgTitle(name: string, isEn: boolean) {
     const [p, ...rest] = trimmed.split(" / ");
     return { primary: p.trim(), secondary: rest.join(" / ").trim() };
   }
-  if (trimmed.includes(" - ")) {
-    const [p, ...rest] = trimmed.split(" - ");
-    return { primary: p.trim(), secondary: rest.join(" - ").trim() };
-  }
   if (trimmed.includes(" • ")) {
     const [p, ...rest] = trimmed.split(" • ");
     return { primary: p.trim(), secondary: rest.join(" • ").trim() };
   }
-  if (!isEn && trimmed.includes(" คณะ")) {
-    const idx = trimmed.indexOf(" คณะ");
-    return {
-      primary: trimmed.substring(0, idx).trim(),
-      secondary: trimmed.substring(idx).trim(),
-    };
-  }
-  if (trimmed.includes(", ")) {
-    const [p, ...rest] = trimmed.split(", ");
-    return { primary: p.trim(), secondary: rest.join(", ").trim() };
-  }
-  if (isEn && trimmed.includes(" Faculty")) {
-    const idx = trimmed.indexOf(" Faculty");
-    return {
-      primary: trimmed.substring(0, idx).trim(),
-      secondary: trimmed.substring(idx).trim(),
-    };
-  }
   return {
     primary: trimmed,
-    secondary: isEn ? "Graduate Thesis & Research Ecosystem" : "ระบบบริหารจัดการวิทยานิพนธ์",
+    secondary: isEn ? "Graduate Thesis & Research Ecosystem" : "ระบบบริหารจัดการและติดตามวิทยานิพนธ์ (GTMTS)",
   };
 }
 

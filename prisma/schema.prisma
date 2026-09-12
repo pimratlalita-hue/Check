@@ -45,6 +45,8 @@ model Tenant {
   rooms        FacilityRoom[]
   roomBookings RoomBooking[]
   examAttendances ExamAttendance[]
+  attendanceSessions AttendanceSession[]
+  attendanceRecords  AttendanceRecord[]
 
   @@map("tenants")
 }
@@ -673,4 +675,65 @@ model ExamAttendance {
   @@index([tenantId, status])
   @@map("exam_attendances")
 }
+
+// -----------------------------------------------------------------------------
+// Classroom Attendance (Hybrid Dynamic QR + Live Instructor Control)
+// -----------------------------------------------------------------------------
+
+enum ClassAttendanceStatus {
+  PRESENT
+  LATE
+  LEAVE
+  ABSENT
+}
+
+enum CheckInMethod {
+  QR_SCAN
+  MANUAL_BY_TEACHER
+}
+
+model AttendanceSession {
+  id               String                 @id @default(uuid()) @db.VarChar(36)
+  tenantId         String                 @map("tenant_id") @db.VarChar(36)
+  courseCode       String                 @map("course_code") @db.VarChar(50)
+  courseName       String                 @map("course_name") @db.VarChar(255)
+  instructorId     String                 @map("instructor_id") @db.VarChar(36)
+  instructorName   String                 @map("instructor_name") @db.VarChar(255)
+  sessionDate      DateTime               @default(now()) @map("session_date")
+  qrToken          String                 @map("qr_token") @db.VarChar(100)
+  tokenExpiresAt   DateTime               @map("token_expires_at")
+  lateAfterMinutes Int                    @default(15) @map("late_after_minutes")
+  isActive         Boolean                @default(true) @map("is_active")
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  tenant           Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  records          AttendanceRecord[]
+
+  @@index([tenantId, courseCode])
+  @@index([tenantId, isActive])
+  @@map("attendance_sessions")
+}
+
+model AttendanceRecord {
+  id               String                 @id @default(uuid()) @db.VarChar(36)
+  tenantId         String                 @map("tenant_id") @db.VarChar(36)
+  sessionId        String                 @map("session_id") @db.VarChar(36)
+  studentCode      String                 @map("student_code") @db.VarChar(50)
+  studentName      String                 @map("student_name") @db.VarChar(255)
+  status           ClassAttendanceStatus  @default(ABSENT)
+  method           CheckInMethod          @default(QR_SCAN)
+  checkInTime      DateTime?              @map("check_in_time")
+  note             String?                @db.Text
+  createdAt        DateTime               @default(now()) @map("created_at")
+  updatedAt        DateTime               @updatedAt @map("updated_at")
+
+  tenant           Tenant                 @relation(fields: [tenantId], references: [id], onDelete: Cascade)
+  session          AttendanceSession      @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@unique([sessionId, studentCode])
+  @@index([tenantId, sessionId])
+  @@map("attendance_records")
+}
+
 
