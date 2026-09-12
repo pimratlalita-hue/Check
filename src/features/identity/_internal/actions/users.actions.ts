@@ -6,7 +6,17 @@ import { env } from "@/shared/lib/infra/env";
 import { prisma } from "@/shared/lib/infra/prisma";
 import { P } from "../../permissions";
 import { requirePermission } from "../rbac";
-import { listUsersQuerySchema, createUserSchema, updateUserSchema, setUserActiveSchema, issuePasswordLinkSchema, requestEmailChangeSchema } from "../validations/users";
+import {
+  listUsersQuerySchema,
+  createUserSchema,
+  updateUserSchema,
+  setUserActiveSchema,
+  issuePasswordLinkSchema,
+  requestEmailChangeSchema,
+  exportUsersQuerySchema,
+  checkExistingEmailsSchema,
+  importUsersSchema,
+} from "../validations/users";
 import * as svc from "../services/user.service";
 
 const em = async () => ({ error: zodErrorMap(await getLocale()) });
@@ -72,3 +82,34 @@ export async function requestEmailChangeAction(input: unknown): Promise<ActionRe
 export async function confirmEmailChangeAction(token: string): Promise<ActionResult<boolean>> {
   return runAction(() => svc.confirmEmailChange(token));
 }
+
+export async function exportUsersAction(q: unknown): Promise<ActionResult<{ filename: string; csvContent: string; count: number }>> {
+  return runAction(async () => {
+    const ctx = await requirePermission(P.usersRead);
+    const locale = await getLocale();
+    const query = exportUsersQuerySchema.parse(q, await em());
+    return svc.exportUsers(ctx.tenantId, query, locale);
+  });
+}
+
+export async function checkExistingEmailsAction(input: unknown): Promise<ActionResult<string[]>> {
+  return runAction(async () => {
+    const ctx = await requirePermission(P.usersManage);
+    const { emails } = checkExistingEmailsSchema.parse(input, await em());
+    return svc.checkExistingEmails(ctx.tenantId, emails);
+  });
+}
+
+export async function importUsersAction(input: unknown): Promise<ActionResult<{
+  total: number;
+  successCount: number;
+  failCount: number;
+  outcomes: svc.ImportUserOutcome[];
+}>> {
+  return runAction(async () => {
+    const ctx = await requirePermission(P.usersManage);
+    const data = importUsersSchema.parse(input, await em());
+    return svc.importUsers({ ...actorOf(ctx), ...data });
+  });
+}
+

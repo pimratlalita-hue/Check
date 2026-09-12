@@ -8,7 +8,7 @@ import { SUPER_ADMIN_CODE } from "../../permissions";
 import { issueToken, consumeToken, TOKEN_TTL } from "../tokens";
 import { writeAudit } from "../audit";
 import { passwordSetupEmail, emailChangeEmail } from "../email-templates";
-import type { ListUsersQuery, RoleAssignment } from "../validations/users";
+import type { ListUsersQuery, RoleAssignment, ExportUsersQuery, ImportUsersInput } from "../validations/users";
 import type { ScopeType } from "../grants";
 
 export interface UserListItem {
@@ -198,3 +198,276 @@ export async function confirmEmailChange(raw: string): Promise<boolean> {
   });
   return true;
 }
+
+function escapeCsvCell(val: unknown): string {
+  if (val === null || val === undefined) return "";
+  const str = String(val);
+  if (str.includes(",") || str.includes('"') || str.includes("\n") || str.includes("\r")) {
+    return `"${str.replace(/"/g, '""')}"`;
+  }
+  return str;
+}
+
+export async function exportUsers(
+  tenantId: string,
+  q: ExportUsersQuery,
+  locale: "th" | "en" = "th"
+): Promise<{ filename: string; csvContent: string; count: number }> {
+  const where = {
+    tenantId,
+    ...(q.status === "active" ? { isActive: true, user: { isActive: true } } : q.status === "inactive" ? { OR: [{ isActive: false }, { user: { isActive: false } }] } : {}),
+    ...(q.roleId ? { userRoles: { some: { roleId: q.roleId } } } : {}),
+    ...(q.search ? { user: { OR: [{ name: { contains: q.search } }, { email: { contains: q.search } }] } } : {}),
+  };
+
+  const rows = await prisma.userTenant.findMany({
+    where,
+    orderBy: { user: { name: "asc" } },
+    include: {
+      user: true,
+      userRoles: { select: roleSelect },
+    },
+    take: 5000,
+  });
+
+  const headers = locale === "th"
+    ? ["อีเมล", "ชื่อ-นามสกุล", "รหัสบทบาท", "ชื่อบทบาท", "สถานะ", "เข้าสู่ระบบล่าสุด", "วันที่สร้าง"]
+    : ["Email", "Name", "Role Codes", "Role Names", "Status", "Last Login", "Created At"];
+
+  const csvLines: string[] = [headers.map(escapeCsvCell).join(",")];
+
+  for (const r of rows) {
+    const isActive = r.isActive && r.user.isActive;
+    const statusText = locale === "th"
+      ? (isActive ? "ใช้งาน" : "ระงับ")
+      : (isActive ? "Active" : "Inactive");
+
+    const roleCodes = r.userRoles.map((ur) => ur.role.code).join(", ");
+    const roleNames = r.userRoles.map((ur) => (locale === "th" ? ur.role.nameTh : ur.role.nameEn)).join(", ");
+    const lastLogin = r.user.lastLoginAt ? r.user.lastLoginAt.toISOString().replace("T", " ").substring(0, 19) : "";
+    const createdAt = r.joinedAt.toISOString().replace("T", " ").substring(0, 19);
+
+    csvLines.push(
+      [
+        r.user.email,
+        r.user.name,
+        roleCodes,
+        roleNames,
+        statusText,
+        lastLogin,
+        createdAt,
+      ]
+        .map(escapeCsvCell)
+        .join(",")
+    );
+  }
+
+  const dateStr = new Date().toISOString().split("T")[0];
+  const filename = `users_export_${dateStr}.csv`;
+  // Prepend UTF-8 BOM so Excel opens Thai characters cleanly
+  const csvContent = "\uFEFF" + csvLines.join("\r\n");
+
+  return { filename, csvContent, count: rows.length };
+}
+
+export async function checkExistingEmails(
+  tenantId: string,
+  emails: string[]
+): Promise<string[]> {
+  void tenantId;
+  const normalized = [...new Set(emails.map((e) => e.trim().toLowerCase()).filter(Boolean))];
+  if (normalized.length === 0) return [];
+  const existing = await prisma.user.findMany({
+    where: { email: { in: normalized } },
+    select: { email: true },
+  });
+  return existing.map((u) => u.email.toLowerCase());
+}
+
+export interface ImportUserOutcome {
+  email: string;
+  name: string;
+  roleName?: string;
+  roleCode?: string;
+  success: boolean;
+  userId?: string;
+  link?: string;
+  mailDelivered?: boolean;
+  error?: string;
+}
+
+export async function importUsers(
+  input: Actor & ImportUsersInput
+): Promise<{
+  total: number;
+  successCount: number;
+  failCount: number;
+  outcomes: ImportUserOutcome[];
+}> {
+  const tenantRoles = await prisma.role.findMany({
+    where: { tenantId: input.tenantId },
+    select: {
+      id: true,
+      code: true,
+      nameTh: true,
+      nameEn: true,
+      isSystem: true,
+      rolePermissions: { select: { permission: { select: { code: true } } } },
+    },
+  });
+
+  const roleByCode = new Map(tenantRoles.map((r) => [r.code.toUpperCase(), r]));
+  const roleById = new Map(tenantRoles.map((r) => [r.id, r]));
+  const roleByNameTh = new Map(tenantRoles.map((r) => [r.nameTh.toLowerCase().trim(), r]));
+  const roleByNameEn = new Map(tenantRoles.map((r) => [r.nameEn.toLowerCase().trim(), r]));
+
+  const defaultRole = input.defaultRoleId ? roleById.get(input.defaultRoleId) : null;
+  const outcomes: ImportUserOutcome[] = [];
+
+  for (const row of input.rows) {
+    const email = row.email.trim().toLowerCase();
+    const name = row.name.trim();
+
+    // 1. Resolve role
+    let targetRole: (typeof tenantRoles)[number] | undefined;
+    if (row.roleId && roleById.has(row.roleId)) {
+      targetRole = roleById.get(row.roleId);
+    } else if (row.roleCode) {
+      const codeUpper = row.roleCode.toUpperCase().trim();
+      const codeLower = row.roleCode.toLowerCase().trim();
+      targetRole =
+        roleByCode.get(codeUpper) ||
+        roleByNameTh.get(codeLower) ||
+        roleByNameEn.get(codeLower);
+    }
+
+    if (!targetRole && defaultRole) {
+      targetRole = defaultRole;
+    }
+
+    if (!targetRole) {
+      outcomes.push({
+        email,
+        name,
+        success: false,
+        error: "role_not_found",
+      });
+      continue;
+    }
+
+    // 2. Enforce permission guards (F1 & F2)
+    if (!input.isSuperAdmin && targetRole.code === SUPER_ADMIN_CODE) {
+      outcomes.push({
+        email,
+        name,
+        roleCode: targetRole.code,
+        roleName: targetRole.nameTh,
+        success: false,
+        error: "super_admin_protected",
+      });
+      continue;
+    }
+
+    if (!input.isSuperAdmin) {
+      const held = new Set(input.permissions);
+      const unheld = targetRole.rolePermissions.some((rp) => !held.has(rp.permission.code));
+      if (unheld) {
+        outcomes.push({
+          email,
+          name,
+          roleCode: targetRole.code,
+          roleName: targetRole.nameTh,
+          success: false,
+          error: "cannot_grant_unheld_permission",
+        });
+        continue;
+      }
+    }
+
+    // 3. Check existing email
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) {
+      outcomes.push({
+        email,
+        name,
+        roleCode: targetRole.code,
+        roleName: targetRole.nameTh,
+        success: false,
+        error: "email_taken",
+      });
+      continue;
+    }
+
+    // 4. Create user in transaction
+    try {
+      const result = await prisma.$transaction(async (tx) => {
+        const user = await tx.user.create({ data: { email, name } });
+        const ut = await tx.userTenant.create({ data: { userId: user.id, tenantId: input.tenantId } });
+        await tx.userRole.create({
+          data: {
+            userTenantId: ut.id,
+            roleId: targetRole!.id,
+            scopeType: "ALL",
+            scopeId: null,
+          },
+        });
+        const { raw } = await issueToken(
+          { userId: user.id, purpose: "PASSWORD_RESET", ttlMs: TOKEN_TTL.PASSWORD_SETUP },
+          tx
+        );
+        await writeAudit(
+          {
+            tenantId: input.tenantId,
+            actorId: input.actorId,
+            action: "user.import",
+            entity: "user",
+            entityId: user.id,
+            after: { email, name, roleId: targetRole!.id, roleCode: targetRole!.code },
+          },
+          tx
+        );
+        return { user, rawToken: raw };
+      });
+
+      const link = setupLink(result.rawToken);
+      let mailDelivered = false;
+      try {
+        const mailRes = await sendMail({
+          to: email,
+          ...passwordSetupEmail("th", { name, link, hours: 72 }),
+        });
+        mailDelivered = mailRes.delivered;
+      } catch {
+        // Mail delivery errors are logged without breaking import
+      }
+
+      outcomes.push({
+        email,
+        name,
+        roleName: targetRole.nameTh,
+        roleCode: targetRole.code,
+        success: true,
+        userId: result.user.id,
+        link,
+        mailDelivered,
+      });
+    } catch (err) {
+      outcomes.push({
+        email,
+        name,
+        roleName: targetRole.nameTh,
+        roleCode: targetRole.code,
+        success: false,
+        error: err instanceof Error ? err.message : "import_failed",
+      });
+    }
+  }
+
+  return {
+    total: input.rows.length,
+    successCount: outcomes.filter((o) => o.success).length,
+    failCount: outcomes.filter((o) => !o.success).length,
+    outcomes,
+  };
+}
+

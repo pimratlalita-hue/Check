@@ -1,10 +1,21 @@
 "use client";
+
 import { useCallback, useEffect, useState, useTransition } from "react";
-import { UserPlus } from "lucide-react";
+import Link from "next/link";
+import { UserPlus, Download, Upload } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { useT } from "@/shared/lib/i18n/client";
-import { listUsersAction, listRolesForPickerAction, createUserAction, updateUserAction, setUserActiveAction, issuePasswordLinkAction, requestEmailChangeAction } from "@/features/identity/actions";
+import {
+  listUsersAction,
+  listRolesForPickerAction,
+  createUserAction,
+  updateUserAction,
+  setUserActiveAction,
+  issuePasswordLinkAction,
+  requestEmailChangeAction,
+  exportUsersAction,
+} from "@/features/identity/actions";
 import { UsersTableCard } from "./users-table-card";
 import { UserDialog } from "./user-dialog";
 import { LinkDialog } from "./link-dialog";
@@ -111,11 +122,73 @@ export function UsersClient({ canManage, selfId }: { canManage: boolean; selfId:
     });
   }
 
+  const [isExporting, setIsExporting] = useState(false);
+
+  async function handleExportCsv() {
+    setIsExporting(true);
+    toast.info(t("users.exporting"));
+    try {
+      const res = await exportUsersAction({
+        search,
+        status,
+        roleId: roleId || undefined,
+      });
+      if (!res.ok) {
+        toast.error(t("users.exportFail"));
+        return;
+      }
+      const blob = new Blob([res.data.csvContent], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = res.data.filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      toast.success(t("users.exportSuccess", { n: res.data.count }));
+    } catch {
+      toast.error(t("users.exportFail"));
+    } finally {
+      setIsExporting(false);
+    }
+  }
+
   return (
     <>
       <header className="ph hr">
         <h1 className="sr-only">{t("users.title")}</h1>
-        {canManage && <div className="acts ml-auto"><Button type="button" onClick={() => { setForm(emptyForm()); setDialog({ kind: "create" }); }}><UserPlus aria-hidden="true" />{t("users.addBtn")}</Button></div>}
+        <div className="acts ml-auto flex items-center gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleExportCsv}
+            disabled={isExporting}
+          >
+            <Download aria-hidden="true" className="w-4 h-4 mr-1.5" />
+            {t("users.exportBtn")}
+          </Button>
+          {canManage && (
+            <>
+              <Button asChild variant="outline">
+                <Link href="/users/import">
+                  <Upload aria-hidden="true" className="w-4 h-4 mr-1.5" />
+                  {t("users.importBtn")}
+                </Link>
+              </Button>
+              <Button
+                type="button"
+                onClick={() => {
+                  setForm(emptyForm());
+                  setDialog({ kind: "create" });
+                }}
+              >
+                <UserPlus aria-hidden="true" className="w-4 h-4 mr-1.5" />
+                {t("users.addBtn")}
+              </Button>
+            </>
+          )}
+        </div>
       </header>
       {/* canManage ของตารางปิดชั่วคราวขณะมี dialog เปิดอยู่ — คอลัมน์เลือกแถว/เมนูสามจุดของพื้นหลังหายไปด้วย
           (นอกจาก UX ที่ถูกต้องอยู่แล้ว คือพื้นหลังไม่ควรโต้ตอบได้ขณะมี dialog บัง — Radix aria-hides พื้นหลังให้
