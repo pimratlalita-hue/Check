@@ -10,8 +10,8 @@ export const MESSAGES: Dictionary = {
   },
   "workflow.portalTitle": { th: "บริการคำร้องวิชาการออนไลน์", en: "Online Academic Petitions" },
   "workflow.portalSubtitle": {
-    th: "ยื่นคำร้อง ติดตามสถานะ และตรวจสอบผลการพิจารณาคำร้องวิชาการและวิทยานิพนธ์ คณะวิทยาการและเทคโนโลยีสารสนเทศ",
-    en: "Submit, track, and monitor academic petitions and thesis approvals, Faculty of Science & Information Technology",
+    th: "ยื่นคำร้อง ติดตามสถานะ และตรวจสอบผลการพิจารณาคำร้องวิชาการและวิทยานิพนธ์ คณะมนุษยศาสตร์",
+    en: "Submit, track, and monitor academic petitions and thesis approvals, Faculty of Humanities",
   },
 
   // Tabs & Filters

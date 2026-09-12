@@ -64,8 +64,8 @@ async function verify() {
   const nameEnInput = page.locator("#s-name-en");
 
   // Fill custom updated organization name
-  const updatedNameTh = "คณะวิทยาการและเทคโนโลยีสารสนเทศ (GTMTS)";
-  const updatedNameEn = "Faculty of Information Science and Technology (GTMTS)";
+  const updatedNameTh = "คณะมนุษยศาสตร์ (GTMTS)";
+  const updatedNameEn = "Faculty of Humanities (GTMTS)";
 
   await nameThInput.fill(updatedNameTh);
   await nameEnInput.fill(updatedNameEn);

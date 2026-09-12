@@ -9,8 +9,8 @@ export const MESSAGES: Dictionary = {
   },
   "staff.portalTitle": { th: "ทำเนียบคณาจารย์และบุคลากร", en: "Faculty & Staff Directory" },
   "staff.portalSubtitle": {
-    th: "ทำเนียบคณาจารย์ นักวิจัย บุคลากรสายสนับสนุน และคณะผู้บริหารคณะวิทยาการและเทคโนโลยีสารสนเทศ",
-    en: "Directory of faculty members, researchers, staff, and executive leadership",
+    th: "ทำเนียบคณาจารย์ นักวิจัย บุคลากรสายสนับสนุน และคณะผู้บริหารคณะมนุษยศาสตร์",
+    en: "Directory of faculty members, researchers, staff, and executive leadership, Faculty of Humanities",
   },
   "staff.executiveBoard": { th: "คณะผู้บริหาร", en: "Executive Board" },
   "staff.allStaff": { th: "บุคลากรทั้งหมด", en: "All Staff" },

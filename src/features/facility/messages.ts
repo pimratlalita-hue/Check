@@ -10,8 +10,8 @@ export const MESSAGES: Dictionary = {
   },
   "facility.portalTitle": { th: "บริการจองห้องและสิ่งอำนวยความสะดวก", en: "Room & Facility Services" },
   "facility.portalSubtitle": {
-    th: "สำรวจสิ่งอำนวยความสะดวก ตรวจสอบตารางเวลาว่าง และจองห้องสอบวิทยานิพนธ์/ห้องประชุมออนไลน์ คณะวิทยาการและเทคโนโลยีสารสนเทศ",
-    en: "Explore facilities, check real-time availability, and reserve thesis exam and meeting rooms",
+    th: "สำรวจสิ่งอำนวยความสะดวก ตรวจสอบตารางเวลาว่าง และจองห้องสอบวิทยานิพนธ์/ห้องประชุมออนไลน์ คณะมนุษยศาสตร์",
+    en: "Explore facilities, check real-time availability, and reserve thesis exam and meeting rooms, Faculty of Humanities",
   },
 
   // Tabs & filters

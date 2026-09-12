@@ -9,8 +9,8 @@ export const MESSAGES: Dictionary = {
   },
   "curriculum.portalTitle": { th: "หลักสูตรการศึกษา", en: "Academic Programs" },
   "curriculum.portalSubtitle": {
-    th: "หลักสูตรระดับปริญญาตรี บัณฑิตศึกษา และหลักสูตรนานาชาติ คณะวิทยาการและเทคโนโลยีสารสนเทศ",
-    en: "Undergraduate, graduate, and international degree programs",
+    th: "หลักสูตรระดับปริญญาตรี บัณฑิตศึกษา และหลักสูตรนานาชาติ คณะมนุษยศาสตร์",
+    en: "Undergraduate, graduate, and international degree programs, Faculty of Humanities",
   },
   "curriculum.allLevels": { th: "ทุกระดับการศึกษา", en: "All Degree Levels" },
   "curriculum.allPrograms": { th: "หลักสูตรทั้งหมด", en: "All Programs" },

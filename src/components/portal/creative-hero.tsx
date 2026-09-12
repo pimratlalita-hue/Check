@@ -207,20 +207,20 @@ export function CreativeHero({
         <div className="space-y-3">
           {/* Main Headline */}
           <h1 className="font-editorial text-6xl sm:text-7xl lg:text-8xl text-slate-900 font-normal tracking-tight leading-[1.02] transition-all duration-500">
-            retro soul, <br className="hidden sm:inline" />
-            <span className="italic font-light bg-gradient-to-r from-slate-900 via-rose-700 to-pink-600 bg-clip-text text-transparent">
-              modern vision.
+            Timeless Wisdom, <br className="hidden sm:inline" />
+            <span className="italic font-light bg-gradient-to-r from-slate-900 via-rose-700 via-purple-700 to-amber-600 bg-clip-text text-transparent">
+              Digital Horizon.
             </span>
           </h1>
 
           {/* Thai Subheading Accent Pill */}
           <div className="pt-2">
-            <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-rose-700 bg-rose-50/90 border border-rose-200/70 px-3.5 py-1 rounded-full shadow-2xs">
+            <span className="inline-flex items-center gap-2 text-xs sm:text-sm font-semibold text-rose-800 bg-gradient-to-r from-rose-50/95 via-purple-50/70 to-amber-50/80 border border-rose-200/80 px-4 py-1.5 rounded-full shadow-2xs">
               <Sparkles className="h-3.5 w-3.5 text-rose-500 shrink-0" />
               <span>
                 {isEn
-                  ? "Graduate Thesis Management & Academic Research Ecosystem"
-                  : "นวัตกรรมการบริหารจัดการวิทยานิพนธ์และผลงานวิจัยระดับบัณฑิตศึกษา"}
+                  ? "Timeless Wisdom, Digital Horizon • Department of Foreign Languages, MCU"
+                  : "รากแก้วแห่งปัญญา สู่ขอบฟ้าวิจัยอัจฉริยะ • ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์"}
               </span>
             </span>
           </div>
@@ -230,7 +230,7 @@ export function CreativeHero({
         <p className="text-base sm:text-lg text-slate-600 font-normal leading-relaxed max-w-2xl">
           {isEn
             ? "A unified scholarly ecosystem streamlining thesis proposals, committee defenses, and AI-accelerated academic milestones with elegance, precision, and verifiability."
-            : "ระบบบริหารจัดการกระบวนการวิทยานิพนธ์ครบวงจร ผสานมาตรฐานวิชาการระดับสูงเข้ากับปัญญาประดิษฐ์และเวิร์กโฟลว์อัจฉริยะ เพื่อการวิจัยที่ก้าวล้ำและตรวจสอบได้ในทุกมิติ"}
+            : "สืบสานมาตรฐานวิชาการและรากแก้วแห่งปัญญามนุษยศาสตร์ ผสานพลังปัญญาประดิษฐ์และเวิร์กโฟลว์อัจฉริยะ เพื่อขับเคลื่อนงานวิจัยวิทยานิพนธ์ระดับบัณฑิตศึกษาสู่มาตรฐานสากล"}
         </p>
 
         {/* ═══ Action Pills & Interactive CTAs ═══ */}

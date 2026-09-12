@@ -78,8 +78,8 @@ export function DirectoryView({ data }: DirectoryViewProps) {
               </h2>
               <p className="text-xs text-slate-500">
                 {locale === "en"
-                  ? "Faculty Executive Leadership Team"
-                  : "คณะผู้บริหารคณะวิทยาการและเทคโนโลยีสารสนเทศ"}
+                  ? "Faculty of Humanities Executive Leadership Team"
+                  : "คณะผู้บริหารคณะมนุษยศาสตร์"}
               </p>
             </div>
           </div>

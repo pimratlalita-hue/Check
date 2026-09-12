@@ -21,7 +21,7 @@ import {
 export async function validateThesisTitle(
   input: ValidateThesisTitleInput
 ): Promise<ThesisTitleValidationResult> {
-  const prompt = `You are a Senior Academic Thesis Reviewer for the Graduate School, Faculty of Information Science.
+  const prompt = `You are a Senior Academic Thesis Reviewer for the Graduate School, Faculty of Humanities.
 Analyze the following proposed thesis title for academic rigor, conciseness, and bilingual alignment:
 - Thai Title: "${input.titleTh}"
 - English Title: "${input.titleEn || ""}"

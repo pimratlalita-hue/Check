@@ -84,7 +84,7 @@ export function generateBookingIcs(booking: RoomBookingDto): string {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//Faculty of Information Science//GTMTS Thesis System//TH",
+    "PRODID:-//Faculty of Humanities//GTMTS Thesis System//TH",
     "CALSCALE:GREGORIAN",
     "METHOD:PUBLISH",
     "BEGIN:VEVENT",

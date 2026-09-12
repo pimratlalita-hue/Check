@@ -167,7 +167,7 @@ export const MESSAGES: Dictionary = {
   "settings.smtpAppPasswordPh": { th: "เช่น abcd efgh ijkl mnop", en: "e.g. abcd efgh ijkl mnop" },
   "settings.smtpAppPasswordHint": { th: "รหัสผ่านสำหรับแอปสร้างจาก บัญชี Google -> ความปลอดภัย -> การยืนยันแบบ 2 ขั้นตอน -> รหัสผ่านสำหรับแอป", en: "Generate via Google Account -> Security -> 2-Step Verification -> App Passwords" },
   "settings.smtpFromName": { th: "ชื่อผู้ส่งที่แสดง (Sender Name)", en: "Display Sender Name" },
-  "settings.smtpFromNamePh": { th: "เช่น บัณฑิตวิทยาลัย คณะวิทยาการและเทคโนโลยีสารสนเทศ", en: "e.g. Graduate Thesis School" },
+  "settings.smtpFromNamePh": { th: "เช่น บัณฑิตศึกษา คณะมนุษยศาสตร์", en: "e.g. Graduate Studies, Faculty of Humanities" },
   "settings.smtpPort": { th: "พอร์ต SMTP (Port)", en: "SMTP Port" },
   "settings.smtpTestTitle": { th: "ทดสอบการเชื่อมต่อและส่งอีเมล (Test Gmail SMTP)", en: "Test Connection & Send Email" },
   "settings.smtpTestDesc": { th: "ทดสอบส่งอีเมลจริงไปยังกล่องจดหมายปลายทางเพื่อยืนยันว่ารหัสผ่านและพอร์ตทำงานถูกต้อง", en: "Send a real test verification email to confirm credentials and network delivery" },
