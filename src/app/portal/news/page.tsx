@@ -10,6 +10,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { listNews, resolvePortalTenantId } from "@/features/news/server";
+import { resolveTenantInfo } from "@/features/identity/server";
 import type { NewsCategory } from "@/features/news";
 import { getLocale, getT } from "@/i18n/server";
 import { formatDate } from "@/shared/lib/format";
@@ -47,8 +48,9 @@ export default async function PortalNewsPage({ searchParams }: PageProps) {
 
   const tenantId = await resolvePortalTenantId();
 
-  // Parallel fetch: news list and featured news
-  const [newsData, featuredData] = await Promise.all([
+  // Parallel fetch: tenant info, news list and featured news
+  const [tenantInfo, newsData, featuredData] = await Promise.all([
+    resolveTenantInfo(),
     listNews(tenantId, {
       page,
       perPage: 9,
@@ -69,7 +71,10 @@ export default async function PortalNewsPage({ searchParams }: PageProps) {
   return (
     <div className="space-y-10">
       {/* MotionSites-Inspired Animated Hero Section */}
-      <CreativeHero />
+      <CreativeHero
+        tenantNameTh={tenantInfo.nameTh}
+        tenantNameEn={tenantInfo.nameEn}
+      />
 
       <div id="portal-content-section" className="space-y-10">
 
