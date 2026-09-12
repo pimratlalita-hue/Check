@@ -24,6 +24,16 @@ export interface DepartmentDto {
   createdAt: string;
   updatedAt: string;
   staffCount?: number;
+  programCount?: number;
+  programs?: Array<{
+    id: string;
+    code: string;
+    nameTh: string;
+    nameEn: string;
+    level: string;
+    status: string;
+    totalCredits: number;
+  }>;
 }
 
 export interface StaffProfileDto {
@@ -101,7 +111,20 @@ function parseJsonArray(val: unknown): string[] | null {
   return null;
 }
 
-function departmentToDto(dept: Department, staffCount?: number): DepartmentDto {
+function departmentToDto(
+  dept: Department,
+  staffCount?: number,
+  programCount?: number,
+  programs?: Array<{
+    id: string;
+    code: string;
+    nameTh: string;
+    nameEn: string;
+    level: string;
+    status: string;
+    totalCredits: number;
+  }>,
+): DepartmentDto {
   return {
     id: dept.id,
     tenantId: dept.tenantId,
@@ -115,6 +138,8 @@ function departmentToDto(dept: Department, staffCount?: number): DepartmentDto {
     createdAt: dept.createdAt.toISOString(),
     updatedAt: dept.updatedAt.toISOString(),
     staffCount,
+    programCount,
+    programs,
   };
 }
 
@@ -188,11 +213,25 @@ export async function listDepartments(
     where,
     orderBy: [{ displayOrder: "asc" }, { code: "asc" }],
     include: {
-      _count: { select: { staffProfiles: true } },
+      _count: { select: { staffProfiles: true, programs: true } },
+      programs: {
+        select: {
+          id: true,
+          code: true,
+          nameTh: true,
+          nameEn: true,
+          level: true,
+          status: true,
+          totalCredits: true,
+        },
+        orderBy: [{ displayOrder: "asc" }, { code: "asc" }],
+      },
     },
   });
 
-  return depts.map((d) => departmentToDto(d, d._count.staffProfiles));
+  return depts.map((d) =>
+    departmentToDto(d, d._count.staffProfiles, d._count.programs, d.programs)
+  );
 }
 
 export async function getDepartmentById(
@@ -202,8 +241,25 @@ export async function getDepartmentById(
 ): Promise<DepartmentDto | null> {
   const dept = await db.department.findFirst({
     where: { id, tenantId },
+    include: {
+      _count: { select: { staffProfiles: true, programs: true } },
+      programs: {
+        select: {
+          id: true,
+          code: true,
+          nameTh: true,
+          nameEn: true,
+          level: true,
+          status: true,
+          totalCredits: true,
+        },
+        orderBy: [{ displayOrder: "asc" }, { code: "asc" }],
+      },
+    },
   });
-  return dept ? departmentToDto(dept) : null;
+  return dept
+    ? departmentToDto(dept, dept._count.staffProfiles, dept._count.programs, dept.programs)
+    : null;
 }
 
 export async function createDepartment(

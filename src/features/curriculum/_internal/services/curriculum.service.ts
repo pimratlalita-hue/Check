@@ -583,3 +583,41 @@ export async function getPublicProgramDetail(
 
   return program ? mapProgramToDto(program) : null;
 }
+
+/**
+ * Assign or reassign program to a department
+ */
+export async function assignProgramDepartment(
+  tenantId: string,
+  programId: string,
+  departmentId: string | null,
+  db: Db = prisma
+): Promise<ProgramDto> {
+  const existing = await db.program.findFirst({
+    where: { id: programId, tenantId },
+  });
+  if (!existing) {
+    throw errors.not_found("program_not_found");
+  }
+
+  if (departmentId) {
+    const dept = await db.department.findFirst({
+      where: { id: departmentId, tenantId },
+    });
+    if (!dept) {
+      throw errors.not_found("department_not_found");
+    }
+  }
+
+  const updated = await db.program.update({
+    where: { id: programId },
+    data: { departmentId },
+    include: {
+      department: true,
+      _count: { select: { courses: true } },
+    },
+  });
+
+  return mapProgramToDto(updated);
+}
+

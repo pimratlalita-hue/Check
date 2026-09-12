@@ -12,6 +12,7 @@ import {
   listProgramsQuerySchema,
   createProgramCourseSchema,
   updateProgramCourseSchema,
+  assignProgramDepartmentSchema,
 } from "./schemas";
 import {
   listPrograms,
@@ -23,6 +24,7 @@ import {
   createProgramCourse,
   updateProgramCourse,
   deleteProgramCourse,
+  assignProgramDepartment,
   type ProgramDto,
   type ProgramListResult,
   type ProgramCourseDto,
@@ -111,3 +113,15 @@ export async function deleteProgramCourseAction(id: string): Promise<ActionResul
     revalidatePath("/portal/curriculum");
   });
 }
+
+export async function assignProgramDepartmentAction(input: unknown): Promise<ActionResult<ProgramDto>> {
+  return runAction(async () => {
+    const ctx = await requirePermission(CURRICULUM_P.curriculumManage);
+    const parsed = assignProgramDepartmentSchema.parse(input, { error: zodErrorMap(await getLocale()) });
+    const result = await assignProgramDepartment(ctx.tenantId, parsed.programId, parsed.departmentId);
+    revalidatePath("/curriculum");
+    revalidatePath("/portal/curriculum");
+    return result;
+  });
+}
+

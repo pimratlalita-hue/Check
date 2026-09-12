@@ -8,6 +8,7 @@ export {
   listPublicPrograms,
   getPublicProgramDetail,
   resolvePortalTenantId,
+  assignProgramDepartment,
   type ProgramDto,
   type ProgramCourseDto,
   type ProgramListResult,

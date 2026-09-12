@@ -14,5 +14,6 @@ export type {
   CreateProgramCourseInput,
   UpdateProgramCourseInput,
   ListProgramsQuery,
+  AssignProgramDepartmentInput,
 } from "./_internal/schemas";
 export { CURRICULUM_P } from "./permissions";

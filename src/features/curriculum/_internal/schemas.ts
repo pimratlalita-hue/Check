@@ -90,3 +90,9 @@ export type ListProgramsQuery = z.infer<typeof listProgramsQuerySchema>;
 
 export type CreateProgramCourseInput = z.infer<typeof createProgramCourseSchema>;
 export type UpdateProgramCourseInput = z.infer<typeof updateProgramCourseSchema>;
+
+export const assignProgramDepartmentSchema = z.object({
+  programId: z.string().uuid(),
+  departmentId: z.string().uuid().nullable(),
+});
+export type AssignProgramDepartmentInput = z.infer<typeof assignProgramDepartmentSchema>;
