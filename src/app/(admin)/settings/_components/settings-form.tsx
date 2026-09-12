@@ -18,12 +18,16 @@ import {
   Image as ImageIcon,
   Copy,
   Key,
+  PhoneCall,
+  Phone,
+  Clock,
+  MapPin,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LiyonCard, LiyonField, PalettePicker } from "@/shared/components/liyon";
 import { useT } from "@/shared/lib/i18n/client";
 import type { PaletteId } from "@/shared/lib/palette";
-import type { TenantSettings, SmtpSettings } from "@/features/identity";
+import type { TenantSettings, SmtpSettings, ContactSettings } from "@/features/identity";
 import { updateSettingsAction, testGmailSmtpAction } from "@/features/identity/actions";
 import { LogoEditorModal } from "./logo-editor-modal";
 import { GlobalOrgPresetsModal } from "./global-org-presets-modal";
@@ -43,6 +47,18 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
       fromName: initial.smtp?.fromName ?? "GTMTS Graduate School",
       port: initial.smtp?.port ?? 587,
     } as SmtpSettings,
+    contact: {
+      addressTh: initial.contact?.addressTh ?? "",
+      addressEn: initial.contact?.addressEn ?? "",
+      phone: initial.contact?.phone ?? "",
+      email: initial.contact?.email ?? "",
+      officeHoursTh: initial.contact?.officeHoursTh ?? "",
+      officeHoursEn: initial.contact?.officeHoursEn ?? "",
+      website: initial.contact?.website ?? "",
+      facebook: initial.contact?.facebook ?? "",
+      lineId: initial.contact?.lineId ?? "",
+      mapUrl: initial.contact?.mapUrl ?? "",
+    } as ContactSettings,
   });
 
   const [errors, setErrors] = useState<Record<string, string[]>>({});
@@ -84,6 +100,25 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
       }
       router.refresh();
     });
+  }
+
+  function applyMcuContactPreset() {
+    setForm((prev) => ({
+      ...prev,
+      contact: {
+        addressTh: "อาคารเรียนรวม ชั้น 3 ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์ มหาวิทยาลัยมหาจุฬาลงกรณราชวิทยาลัย ต.ลำไทร อ.วังน้อย จ.พระนครศรีอยุธยา 13170",
+        addressEn: "3rd Floor, Classroom Building, Department of Foreign Languages, Faculty of Humanities, Mahachulalongkornrajavidyalaya University, Lam Sai, Wang Noi, Phra Nakhon Si Ayutthaya 13170 Thailand",
+        phone: "035-248-000 ต่อ 8400, 8401",
+        email: "grad.humanities@mcu.ac.th",
+        officeHoursTh: "วันจันทร์ - วันศุกร์: 08:30 - 16:30 น. (หยุดวันธรรมสวนะและวันหยุดนักขัตฤกษ์)",
+        officeHoursEn: "Monday - Friday: 08:30 AM - 04:30 PM (Closed on Buddhist & Public Holidays)",
+        website: "https://human.mcu.ac.th",
+        facebook: "https://facebook.com/mcuhumanities",
+        lineId: "@mcuhumanities",
+        mapUrl: "https://maps.google.com/?q=Mahachulalongkornrajavidyalaya+University",
+      },
+    }));
+    toast.success("นำเข้าข้อมูลการติดต่อมาตรฐาน มจร. เรียบร้อยแล้ว (อย่าลืมกดปุ่มบันทึก)");
   }
 
   async function runTestEmail() {
@@ -270,6 +305,228 @@ export function SettingsForm({ initial }: { initial: TenantSettings }) {
                   <span>{t("settings.globalPresetsBtn")}</span>
                 </Button>
               </div>
+            </div>
+          </div>
+        </LiyonCard>
+
+        {/* 1.5 ข้อมูลการติดต่อองค์กร (Contact Information & Location) */}
+        <LiyonCard>
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 mb-4 gap-3">
+            <div className="flex items-center gap-2.5">
+              <div className="p-2 rounded-lg bg-rose-50 text-rose-600 border border-rose-100">
+                <PhoneCall className="h-5 w-5" />
+              </div>
+              <div>
+                <h2 className="text-lg font-bold text-slate-900 m-0">
+                  ข้อมูลการติดต่อองค์กร (Contact Information & Location)
+                </h2>
+                <p className="text-xs text-slate-500 m-0">
+                  ข้อมูลที่อยู่ เบอร์โทรศัพท์ อีเมล วันเวลาทำการ และช่องทางโซเชียลมีเดียที่จะนำไปแสดงผลที่ส่วนท้าย (Footer) ของฝั่ง Portal
+                </p>
+              </div>
+            </div>
+
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={applyMcuContactPreset}
+              className="gap-1.5 text-xs text-rose-700 bg-rose-50/50 hover:bg-rose-100/70 border-rose-200 shrink-0"
+            >
+              <Sparkles className="h-3.5 w-3.5 text-rose-600" />
+              <span>ใช้ค่ามาตรฐาน มจร.</span>
+            </Button>
+          </div>
+
+          <div className="space-y-4">
+            {/* ที่อยู่ ภาษาไทย และ ภาษาอังกฤษ */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <LiyonField label="ที่อยู่ / ที่ตั้งองค์กร (ภาษาไทย)" htmlFor="s-address-th">
+                <textarea
+                  id="s-address-th"
+                  rows={3}
+                  placeholder="เช่น อาคารเรียนรวม ชั้น 3 ภาควิชาภาษาต่างประเทศ คณะมนุษยศาสตร์ มหาวิทยาลัยมหาจุฬาลงกรณราชวิทยาลัย ต.ลำไทร อ.วังน้อย จ.พระนครศรีอยุธยา 13170"
+                  value={form.contact.addressTh}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      contact: { ...form.contact, addressTh: e.target.value },
+                    })
+                  }
+                  className="w-full text-xs"
+                />
+              </LiyonField>
+
+              <LiyonField label="ที่อยู่ / ที่ตั้งองค์กร (English)" htmlFor="s-address-en">
+                <textarea
+                  id="s-address-en"
+                  rows={3}
+                  placeholder="e.g. 3rd Floor, Classroom Building, Department of Foreign Languages, Faculty of Humanities, MCU, Ayutthaya 13170"
+                  value={form.contact.addressEn}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      contact: { ...form.contact, addressEn: e.target.value },
+                    })
+                  }
+                  className="w-full text-xs"
+                />
+              </LiyonField>
+            </div>
+
+            {/* โทรศัพท์ และ อีเมล */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <LiyonField label="หมายเลขโทรศัพท์ / โทรสาร" htmlFor="s-phone">
+                <div className="relative">
+                  <Phone className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-phone"
+                    type="text"
+                    placeholder="เช่น 035-248-000 ต่อ 8400, 8401"
+                    value={form.contact.phone}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, phone: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
+
+              <LiyonField label="อีเมลติดต่อทางการ" htmlFor="s-contact-email">
+                <div className="relative">
+                  <Mail className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-contact-email"
+                    type="email"
+                    placeholder="เช่น grad.humanities@mcu.ac.th"
+                    value={form.contact.email}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, email: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
+            </div>
+
+            {/* วันเวลาทำการ ไทย และ อังกฤษ */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <LiyonField label="วันและเวลาทำการ (ภาษาไทย)" htmlFor="s-hours-th">
+                <div className="relative">
+                  <Clock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-hours-th"
+                    type="text"
+                    placeholder="เช่น จันทร์ - ศุกร์: 08:30 - 16:30 น."
+                    value={form.contact.officeHoursTh}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, officeHoursTh: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
+
+              <LiyonField label="วันและเวลาทำการ (English)" htmlFor="s-hours-en">
+                <div className="relative">
+                  <Clock className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-hours-en"
+                    type="text"
+                    placeholder="e.g. Monday - Friday: 08:30 AM - 04:30 PM"
+                    value={form.contact.officeHoursEn}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, officeHoursEn: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
+            </div>
+
+            {/* ลิงก์ออนไลน์: เว็บไซต์, Facebook, Line ID, Google Maps */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 pt-1">
+              <LiyonField label="เว็บไซต์ทางการ (URL)" htmlFor="s-website">
+                <div className="relative">
+                  <Globe className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-website"
+                    type="url"
+                    placeholder="https://human.mcu.ac.th"
+                    value={form.contact.website}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, website: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
+
+              <LiyonField label="Facebook Page (URL)" htmlFor="s-facebook">
+                <input
+                  id="s-facebook"
+                  type="url"
+                  placeholder="https://facebook.com/..."
+                  value={form.contact.facebook}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      contact: { ...form.contact, facebook: e.target.value },
+                    })
+                  }
+                  className="text-xs"
+                />
+              </LiyonField>
+
+              <LiyonField label="Line ID / Official" htmlFor="s-line">
+                <input
+                  id="s-line"
+                  type="text"
+                  placeholder="@mcuhumanities"
+                  value={form.contact.lineId}
+                  onChange={(e) =>
+                    setForm({
+                      ...form,
+                      contact: { ...form.contact, lineId: e.target.value },
+                    })
+                  }
+                  className="text-xs"
+                />
+              </LiyonField>
+
+              <LiyonField label="Google Maps (Link)" htmlFor="s-maps">
+                <div className="relative">
+                  <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-slate-400" />
+                  <input
+                    id="s-maps"
+                    type="url"
+                    placeholder="https://maps.google.com/..."
+                    value={form.contact.mapUrl}
+                    onChange={(e) =>
+                      setForm({
+                        ...form,
+                        contact: { ...form.contact, mapUrl: e.target.value },
+                      })
+                    }
+                    className="pl-9 text-xs"
+                  />
+                </div>
+              </LiyonField>
             </div>
           </div>
         </LiyonCard>

@@ -3,7 +3,7 @@ import { prisma, type Db } from "@/shared/lib/infra/prisma";
 import { DEFAULT_PALETTE, isPalette, type PaletteId } from "@/shared/lib/palette";
 import { errors } from "@/shared/lib/errors";
 import { writeAudit } from "../audit";
-import type { UpdateSettingsInput, SmtpSettings } from "../validations/settings";
+import type { UpdateSettingsInput, SmtpSettings, ContactSettings } from "../validations/settings";
 
 export interface TenantSettings {
   code: string;
@@ -12,12 +12,13 @@ export interface TenantSettings {
   logoUrl: string | null;
   palette: PaletteId;
   smtp?: SmtpSettings;
+  contact?: ContactSettings;
 }
 
 async function readTenantSettings(tenantId: string, db: Db): Promise<TenantSettings> {
   const t = await db.tenant.findUnique({ where: { id: tenantId } });
   if (!t) throw errors.not_found();
-  const s = t.settings as { palette?: unknown; smtp?: SmtpSettings } | null;
+  const s = t.settings as { palette?: unknown; smtp?: SmtpSettings; contact?: ContactSettings } | null;
   const p = s?.palette;
   return {
     code: t.code,
@@ -26,6 +27,7 @@ async function readTenantSettings(tenantId: string, db: Db): Promise<TenantSetti
     logoUrl: t.logoUrl,
     palette: isPalette(p) ? p : DEFAULT_PALETTE,
     smtp: s?.smtp,
+    contact: s?.contact,
   };
 }
 
@@ -50,6 +52,7 @@ export async function updateTenantSettings(input: { tenantId: string; actorId: s
           ...(t.settings as object),
           palette: input.palette,
           smtp: input.smtp,
+          contact: input.contact,
         },
       },
     });
@@ -92,6 +95,7 @@ export interface TenantInfo {
   nameTh: string;
   nameEn: string;
   logoUrl: string | null;
+  contact?: ContactSettings;
 }
 
 /** ดึงข้อมูลชื่อองค์กรสำหรับแสดงผลใน Navbar ทั้ง Portal และ Admin · แคชต่อ Request และไม่ throw */
@@ -107,12 +111,14 @@ export const resolveTenantInfo = cache(async (): Promise<TenantInfo> => {
     }
     const t = await prisma.tenant.findUnique({
       where: { id: tenantId },
-      select: { nameTh: true, nameEn: true, logoUrl: true },
+      select: { nameTh: true, nameEn: true, logoUrl: true, settings: true },
     });
+    const contact = (t?.settings as { contact?: ContactSettings } | null)?.contact;
     return {
       nameTh: t?.nameTh || "องค์กรตัวอย่าง",
       nameEn: t?.nameEn || "Sample Organization",
       logoUrl: t?.logoUrl || null,
+      contact,
     };
   } catch {
     return {
