@@ -1,7 +1,19 @@
 "use client";
 
-import React, { useState } from "react";
-import { GraduationCap, BookOpen, Target, Plus, Trash2, Upload, FileText } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import {
+  GraduationCap,
+  BookOpen,
+  Target,
+  Plus,
+  Trash2,
+  Upload,
+  FileText,
+  Download,
+  FileCode,
+  Copy,
+  Check,
+} from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/shared/lib/i18n/client";
 import {
@@ -90,6 +102,202 @@ export function CurriculumDialog({
     getInitialProgramFormData(program)
   );
   const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isJsonModalOpen, setIsJsonModalOpen] = useState(false);
+  const [rawJsonText, setRawJsonText] = useState("");
+  const [isCopiedJson, setIsCopiedJson] = useState(false);
+
+  useEffect(() => {
+    if (open) {
+      setFormData(getInitialProgramFormData(program));
+    }
+  }, [open, program]);
+
+  const getExportPayload = () => {
+    return {
+      code: formData.code,
+      nameTh: formData.nameTh,
+      nameEn: formData.nameEn,
+      degreeTh: formData.degreeTh,
+      degreeEn: formData.degreeEn,
+      degreeShortTh: formData.degreeShortTh,
+      degreeShortEn: formData.degreeShortEn,
+      level: formData.level,
+      type: formData.type,
+      status: formData.status,
+      slug: formData.slug,
+      totalCredits: formData.totalCredits,
+      studyDuration: formData.studyDuration,
+      tuitionFee: formData.tuitionFee || "",
+      descriptionTh: formData.descriptionTh || "",
+      descriptionEn: formData.descriptionEn || "",
+      philosophyTh: formData.philosophyTh || "",
+      philosophyEn: formData.philosophyEn || "",
+      careerPaths: formData.careerPaths || [],
+      learningOutcomes: formData.learningOutcomes || [],
+      handbookUrl: formData.handbookUrl || "",
+      imageUrl: formData.imageUrl || "",
+      departmentId: formData.departmentId || "",
+      displayOrder: formData.displayOrder ?? 0,
+    };
+  };
+
+  const handleExportJson = () => {
+    try {
+      const payload = getExportPayload();
+      const dataStr =
+        "data:text/json;charset=utf-8," +
+        encodeURIComponent(JSON.stringify(payload, null, 2));
+      const downloadAnchor = document.createElement("a");
+      const filename = `curriculum_${formData.code || formData.slug || "program"}.json`;
+      downloadAnchor.setAttribute("href", dataStr);
+      downloadAnchor.setAttribute("download", filename);
+      document.body.appendChild(downloadAnchor);
+      downloadAnchor.click();
+      downloadAnchor.remove();
+      toast.success(t("curriculum.exportJsonSuccess"));
+    } catch (err) {
+      console.error("Export error:", err);
+      toast.error("ไม่สามารถส่งออกไฟล์ JSON ได้");
+    }
+  };
+
+  const applyJsonData = (raw: Record<string, unknown>): boolean => {
+    if (!raw || typeof raw !== "object") {
+      toast.error(t("curriculum.importJsonError"));
+      return false;
+    }
+
+    let outcomes: LearningOutcome[] = [];
+    if (Array.isArray(raw.learningOutcomes)) {
+      outcomes = raw.learningOutcomes
+        .filter((o): o is Record<string, unknown> => Boolean(o && typeof o === "object"))
+        .map((o) => ({
+          code: String(o.code || "").trim(),
+          descTh: String(o.descTh || "").trim(),
+          descEn: o.descEn ? String(o.descEn).trim() : null,
+        }))
+        .filter((o) => o.code && o.descTh);
+    }
+
+    let careers: string[] = [];
+    if (Array.isArray(raw.careerPaths)) {
+      careers = raw.careerPaths
+        .map((c) => String(c || "").trim())
+        .filter(Boolean);
+    }
+
+    const validLevels: DegreeLevel[] = ["BACHELOR", "MASTER", "DOCTORAL", "CERTIFICATE"];
+    const level: DegreeLevel =
+      typeof raw.level === "string" && validLevels.includes(raw.level as DegreeLevel)
+        ? (raw.level as DegreeLevel)
+        : formData.level || "BACHELOR";
+
+    const validTypes: ProgramType[] = ["THAI", "INTERNATIONAL", "BILINGUAL"];
+    const type: ProgramType =
+      typeof raw.type === "string" && validTypes.includes(raw.type as ProgramType)
+        ? (raw.type as ProgramType)
+        : formData.type || "THAI";
+
+    const validStatuses: ProgramStatus[] = ["DRAFT", "ACTIVE", "REVISED", "ARCHIVED"];
+    const status: ProgramStatus =
+      typeof raw.status === "string" && validStatuses.includes(raw.status as ProgramStatus)
+        ? (raw.status as ProgramStatus)
+        : formData.status || "ACTIVE";
+
+    setFormData((prev) => ({
+      ...prev,
+      code: raw.code !== undefined ? String(raw.code) : prev.code,
+      nameTh: raw.nameTh !== undefined ? String(raw.nameTh) : prev.nameTh,
+      nameEn: raw.nameEn !== undefined ? String(raw.nameEn) : prev.nameEn,
+      degreeTh: raw.degreeTh !== undefined ? String(raw.degreeTh) : prev.degreeTh,
+      degreeEn: raw.degreeEn !== undefined ? String(raw.degreeEn) : prev.degreeEn,
+      degreeShortTh: raw.degreeShortTh !== undefined ? String(raw.degreeShortTh) : prev.degreeShortTh,
+      degreeShortEn: raw.degreeShortEn !== undefined ? String(raw.degreeShortEn) : prev.degreeShortEn,
+      level,
+      type,
+      status,
+      slug: raw.slug !== undefined ? String(raw.slug) : prev.slug,
+      totalCredits:
+        raw.totalCredits !== undefined ? Number(raw.totalCredits) || 0 : prev.totalCredits,
+      studyDuration:
+        raw.studyDuration !== undefined ? String(raw.studyDuration) : prev.studyDuration,
+      tuitionFee: raw.tuitionFee !== undefined ? String(raw.tuitionFee) : prev.tuitionFee,
+      descriptionTh:
+        raw.descriptionTh !== undefined ? String(raw.descriptionTh) : prev.descriptionTh,
+      descriptionEn:
+        raw.descriptionEn !== undefined ? String(raw.descriptionEn) : prev.descriptionEn,
+      philosophyTh:
+        raw.philosophyTh !== undefined ? String(raw.philosophyTh) : prev.philosophyTh,
+      philosophyEn:
+        raw.philosophyEn !== undefined ? String(raw.philosophyEn) : prev.philosophyEn,
+      careerPaths: raw.careerPaths !== undefined ? careers : prev.careerPaths,
+      learningOutcomes: raw.learningOutcomes !== undefined ? outcomes : prev.learningOutcomes,
+      handbookUrl: raw.handbookUrl !== undefined ? String(raw.handbookUrl) : prev.handbookUrl,
+      imageUrl: raw.imageUrl !== undefined ? String(raw.imageUrl) : prev.imageUrl,
+      departmentId:
+        raw.departmentId !== undefined ? String(raw.departmentId) : prev.departmentId,
+      displayOrder:
+        raw.displayOrder !== undefined ? Number(raw.displayOrder) || 0 : prev.displayOrder,
+    }));
+
+    toast.success(t("curriculum.importJsonSuccess"));
+    return true;
+  };
+
+  const handleImportJsonFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const content = event.target?.result as string;
+        const parsed = JSON.parse(content);
+        applyJsonData(parsed);
+      } catch {
+        toast.error(t("curriculum.importJsonError"));
+      } finally {
+        if (fileInputRef.current) {
+          fileInputRef.current.value = "";
+        }
+      }
+    };
+    reader.onerror = () => {
+      toast.error(t("curriculum.importJsonError"));
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+    };
+    reader.readAsText(file);
+  };
+
+  const openJsonEditor = () => {
+    setRawJsonText(JSON.stringify(getExportPayload(), null, 2));
+    setIsJsonModalOpen(true);
+  };
+
+  const handleCopyJson = async () => {
+    try {
+      await navigator.clipboard.writeText(rawJsonText);
+      setIsCopiedJson(true);
+      toast.success(t("curriculum.copiedJson"));
+      setTimeout(() => setIsCopiedJson(false), 2000);
+    } catch {
+      toast.error("ไม่สามารถคัดลอกข้อความได้");
+    }
+  };
+
+  const handleApplyRawJson = () => {
+    try {
+      const parsed = JSON.parse(rawJsonText);
+      if (applyJsonData(parsed)) {
+        setIsJsonModalOpen(false);
+      }
+    } catch {
+      toast.error(t("curriculum.importJsonError"));
+    }
+  };
 
   const handleUploadHandbook = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -209,7 +417,8 @@ export function CurriculumDialog({
   };
 
   return (
-    <LiyonDialog open={open} onOpenChange={onOpenChange} wide>
+    <>
+      <LiyonDialog open={open} onOpenChange={onOpenChange} wide>
       <LiyonDialogCloseButton label={t("common.close")} />
       <LiyonDialogHeader
         title={formData.id ? t("curriculum.edit") : t("curriculum.create")}
@@ -219,44 +428,91 @@ export function CurriculumDialog({
       <form onSubmit={handleSubmit} className="flex flex-col h-full">
         <LiyonDialogBody>
           <div className="space-y-4 max-h-[65vh] overflow-y-auto pr-1">
-            {/* Tabs */}
-            <div className="flex border-b border-slate-200">
-              <button
-                type="button"
-                onClick={() => setActiveTab("general")}
-                className={`pb-2.5 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                  activeTab === "general"
-                    ? "border-rose-600 text-rose-600 font-semibold"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <GraduationCap className="h-4 w-4" />
-                <span>{t("curriculum.tab.general")}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("details")}
-                className={`pb-2.5 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                  activeTab === "details"
-                    ? "border-rose-600 text-rose-600 font-semibold"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <BookOpen className="h-4 w-4" />
-                <span>{t("curriculum.tab.details")}</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setActiveTab("outcomes")}
-                className={`pb-2.5 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
-                  activeTab === "outcomes"
-                    ? "border-rose-600 text-rose-600 font-semibold"
-                    : "border-transparent text-slate-500 hover:text-slate-800"
-                }`}
-              >
-                <Target className="h-4 w-4" />
-                <span>{t("curriculum.tab.outcomes")}</span>
-              </button>
+            {/* Top Toolbar: Tabs + JSON Actions */}
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-200 pb-2">
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleImportJsonFile}
+                accept=".json,application/json"
+                className="hidden"
+              />
+              {/* Tabs */}
+              <div className="flex border-b-0">
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("general")}
+                  className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                    activeTab === "general"
+                      ? "border-rose-600 text-rose-600 font-semibold"
+                      : "border-transparent text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <GraduationCap className="h-4 w-4" />
+                  <span>{t("curriculum.tab.general")}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("details")}
+                  className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                    activeTab === "details"
+                      ? "border-rose-600 text-rose-600 font-semibold"
+                      : "border-transparent text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <BookOpen className="h-4 w-4" />
+                  <span>{t("curriculum.tab.details")}</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveTab("outcomes")}
+                  className={`pb-2 px-3 text-sm font-medium border-b-2 transition-colors flex items-center gap-1.5 ${
+                    activeTab === "outcomes"
+                      ? "border-rose-600 text-rose-600 font-semibold"
+                      : "border-transparent text-slate-500 hover:text-slate-800"
+                  }`}
+                >
+                  <Target className="h-4 w-4" />
+                  <span>{t("curriculum.tab.outcomes")}</span>
+                </button>
+              </div>
+
+              {/* JSON Actions */}
+              <div className="flex items-center gap-1.5">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleExportJson}
+                  className="h-8 text-xs font-medium text-slate-700 hover:text-rose-600 border-slate-200 hover:border-rose-300 flex items-center gap-1.5 shadow-2xs"
+                  title={t("curriculum.exportJson")}
+                >
+                  <Download className="h-3.5 w-3.5 text-rose-600" />
+                  <span>{t("curriculum.exportJson")}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="h-8 text-xs font-medium text-slate-700 hover:text-rose-600 border-slate-200 hover:border-rose-300 flex items-center gap-1.5 shadow-2xs"
+                  title={t("curriculum.importJson")}
+                >
+                  <Upload className="h-3.5 w-3.5 text-rose-600" />
+                  <span>{t("curriculum.importJson")}</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={openJsonEditor}
+                  className="h-8 text-xs font-medium text-slate-700 hover:text-rose-600 border-slate-200 hover:border-rose-300 flex items-center gap-1.5 shadow-2xs"
+                  title={t("curriculum.editJson")}
+                >
+                  <FileCode className="h-3.5 w-3.5 text-rose-600" />
+                  <span>{t("curriculum.editJson")}</span>
+                </Button>
+              </div>
             </div>
 
             {/* Tab 1: General Info */}
@@ -692,21 +948,136 @@ export function CurriculumDialog({
         </LiyonDialogBody>
 
         <LiyonDialogFooter>
-          <div className="flex justify-end gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => onOpenChange(false)}
-              disabled={isSubmitting}
-            >
-              {t("common.cancel")}
-            </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? t("common.saving") : t("common.save")}
-            </Button>
+          <div className="flex w-full items-center justify-between">
+            <div className="flex items-center gap-1.5">
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={handleExportJson}
+                className="h-8 text-xs text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center gap-1.5"
+              >
+                <Download className="h-3.5 w-3.5 text-rose-600" />
+                <span>{t("curriculum.exportJson")}</span>
+              </Button>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => fileInputRef.current?.click()}
+                className="h-8 text-xs text-slate-600 hover:text-rose-600 hover:bg-rose-50 flex items-center gap-1.5"
+              >
+                <Upload className="h-3.5 w-3.5 text-rose-600" />
+                <span>{t("curriculum.importJson")}</span>
+              </Button>
+            </div>
+            <div className="flex justify-end gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => onOpenChange(false)}
+                disabled={isSubmitting}
+              >
+                {t("common.cancel")}
+              </Button>
+              <Button type="submit" disabled={isSubmitting}>
+                {isSubmitting ? t("common.saving") : t("common.save")}
+              </Button>
+            </div>
           </div>
         </LiyonDialogFooter>
       </form>
     </LiyonDialog>
+
+    {/* JSON Viewer/Editor Dialog */}
+    <LiyonDialog open={isJsonModalOpen} onOpenChange={setIsJsonModalOpen} wide>
+      <LiyonDialogCloseButton label={t("common.close")} />
+      <LiyonDialogHeader
+        title={t("curriculum.jsonModalTitle")}
+        description={t("curriculum.jsonModalDesc")}
+      />
+      <LiyonDialogBody>
+        <div className="space-y-3">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              JSON Data
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleCopyJson}
+                className="h-7 text-xs flex items-center gap-1 border-slate-200 hover:text-rose-600"
+              >
+                {isCopiedJson ? (
+                  <>
+                    <Check className="h-3.5 w-3.5 text-emerald-600" />
+                    <span className="text-emerald-600 font-medium">
+                      {t("curriculum.copiedJson")}
+                    </span>
+                  </>
+                ) : (
+                  <>
+                    <Copy className="h-3.5 w-3.5 text-slate-500" />
+                    <span>{t("curriculum.copyJson")}</span>
+                  </>
+                )}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleExportJson}
+                className="h-7 text-xs flex items-center gap-1 border-slate-200 hover:text-rose-600"
+              >
+                <Download className="h-3.5 w-3.5 text-slate-500" />
+                <span>{t("curriculum.exportJson")}</span>
+              </Button>
+            </div>
+          </div>
+          <textarea
+            value={rawJsonText}
+            onChange={(e) => setRawJsonText(e.target.value)}
+            rows={15}
+            className="w-full font-mono text-xs p-3 bg-slate-900 text-emerald-400 rounded-xl border border-slate-700 focus:outline-none focus:ring-2 focus:ring-rose-500/50 resize-y shadow-inner leading-relaxed"
+            placeholder="{ ... }"
+            spellCheck={false}
+          />
+        </div>
+      </LiyonDialogBody>
+      <LiyonDialogFooter>
+        <div className="flex w-full items-center justify-between">
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+            className="text-xs"
+          >
+            <Upload className="h-3.5 w-3.5 mr-1 text-slate-500" />
+            {t("curriculum.importJson")}
+          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setIsJsonModalOpen(false)}
+            >
+              {t("common.cancel")}
+            </Button>
+            <Button
+              type="button"
+              onClick={handleApplyRawJson}
+              className="bg-rose-600 hover:bg-rose-700 text-white"
+            >
+              <Check className="h-4 w-4 mr-1" />
+              {t("curriculum.applyJson")}
+            </Button>
+          </div>
+        </div>
+      </LiyonDialogFooter>
+    </LiyonDialog>
+  </>
   );
 }

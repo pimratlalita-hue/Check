@@ -126,6 +126,17 @@ export const MESSAGES: Dictionary = {
   "curriculum.courseCreatedSuccess": { th: "เพิ่มรายวิชาเรียบร้อยแล้ว", en: "Course added successfully" },
   "curriculum.courseUpdatedSuccess": { th: "แก้ไขรายวิชาเรียบร้อยแล้ว", en: "Course updated successfully" },
   "curriculum.courseDeletedSuccess": { th: "ลบรายวิชาเรียบร้อยแล้ว", en: "Course deleted successfully" },
+  "curriculum.exportJson": { th: "ส่งออก JSON", en: "Export JSON" },
+  "curriculum.importJson": { th: "นำเข้า JSON", en: "Import JSON" },
+  "curriculum.editJson": { th: "ดู/แก้ไข JSON", en: "View/Edit JSON" },
+  "curriculum.jsonModalTitle": { th: "จัดการข้อมูล JSON ของหลักสูตร", en: "Curriculum JSON Configuration" },
+  "curriculum.jsonModalDesc": { th: "ดู แก้ไข คัดลอก หรือวางโค้ด JSON เพื่อนำเข้าข้อมูลหลักสูตรทั้งหมดอย่างรวดเร็ว", en: "View, edit, copy or paste JSON to quickly populate program data" },
+  "curriculum.applyJson": { th: "นำข้อมูล JSON เข้าฟอร์ม", en: "Apply JSON to Form" },
+  "curriculum.copyJson": { th: "คัดลอก JSON", en: "Copy JSON" },
+  "curriculum.copiedJson": { th: "คัดลอก JSON เรียบร้อยแล้ว", en: "JSON copied to clipboard" },
+  "curriculum.exportJsonSuccess": { th: "ส่งออกไฟล์ JSON เรียบร้อยแล้ว", en: "Exported JSON successfully" },
+  "curriculum.importJsonSuccess": { th: "นำเข้าข้อมูลหลักสูตรจาก JSON สำเร็จแล้ว", en: "Curriculum imported from JSON successfully" },
+  "curriculum.importJsonError": { th: "ไฟล์หรือรูปแบบ JSON ไม่ถูกต้อง", en: "Invalid JSON file or format" },
 
   // Department & Division Management
   "curriculum.tab.programs": { th: "รายการหลักสูตร", en: "Curriculums & Programs" },
