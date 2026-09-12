@@ -5,9 +5,10 @@ import { getLocale } from "@/shared/lib/i18n/server";
 import { zodErrorMap } from "@/shared/lib/i18n/zod-locale";
 import { P } from "../../permissions";
 import { requirePermission } from "../rbac";
-import { updateSettingsSchema, testSmtpSchema } from "../validations/settings";
+import { updateSettingsSchema, testSmtpSchema, testGeminiApiSchema } from "../validations/settings";
 import { getTenantSettings, updateTenantSettings, type TenantSettings } from "../services/tenant.service";
 import nodemailer from "nodemailer";
+import { GoogleGenAI } from "@google/genai";
 
 export async function getSettingsAction(): Promise<ActionResult<TenantSettings>> {
   return runAction(async () => getTenantSettings((await requirePermission(P.settingsManage)).tenantId));
@@ -82,3 +83,29 @@ export async function testGmailSmtpAction(input: unknown): Promise<ActionResult<
     return { delivered: true, recipient: data.recipient };
   });
 }
+
+export async function testGeminiApiAction(
+  input: unknown
+): Promise<ActionResult<{ success: boolean; model: string; reply: string }>> {
+  return runAction(async () => {
+    await requirePermission(P.settingsManage);
+    const locale = await getLocale();
+    const data = testGeminiApiSchema.parse(input, { error: zodErrorMap(locale) });
+
+    const ai = new GoogleGenAI({ apiKey: data.apiKey });
+    const model = data.model || "gemini-2.5-flash";
+
+    const response = await ai.models.generateContent({
+      model,
+      contents: "สวัสดี Gemini นี่คือข้อความทดสอบการเชื่อมต่อ API จากระบบ GTMTS มจร. กรุณาตอบกลับสั้นๆ หนึ่งประโยคว่าพร้อมให้บริการ",
+    });
+
+    const reply = response.text?.trim() || "การเชื่อมต่อกับ Google Gemini สำเร็จเรียบร้อยแล้ว พร้อมให้บริการ";
+    return {
+      success: true,
+      model,
+      reply,
+    };
+  });
+}
+

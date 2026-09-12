@@ -4,7 +4,10 @@ import { revalidatePath } from "next/cache";
 import { runAction, type ActionResult } from "@/shared/lib/result";
 import { getLocale } from "@/shared/lib/i18n/server";
 import { zodErrorMap } from "@/shared/lib/i18n/zod-locale";
-import { requirePermission } from "@/features/identity/server";
+import { requirePermission, getTenantSettings } from "@/features/identity/server";
+import { generateEnglishNewsContent } from "@/features/ai/server";
+import type { GeneratedEnglishNewsResult } from "@/features/ai";
+import { z } from "zod";
 import { NEWS_P } from "../permissions";
 import {
   createNewsSchema,
@@ -89,5 +92,37 @@ export async function changeNewsStatusAction(id: string, status: NewsStatus): Pr
     revalidatePath("/news");
     revalidatePath("/(admin)/news");
     return result;
+  });
+}
+
+const generateEnglishNewsActionSchema = z.object({
+  titleTh: z.string().trim().min(1, "title_th_required"),
+  summaryTh: z.string().trim().optional(),
+  contentTh: z.string().trim().min(1, "content_th_required"),
+  category: z.string().optional(),
+});
+
+export async function generateEnglishNewsAction(
+  input: unknown
+): Promise<ActionResult<GeneratedEnglishNewsResult>> {
+  return runAction(async () => {
+    const ctx = await requirePermission(NEWS_P.newsManage);
+    const parsed = generateEnglishNewsActionSchema.parse(input, {
+      error: zodErrorMap(await getLocale()),
+    });
+
+    // Resolve tenant settings to retrieve configured Gemini API key & model
+    const settings = await getTenantSettings(ctx.tenantId);
+    const apiKey = settings.ai?.geminiApiKey?.trim() || undefined;
+    const model = settings.ai?.model || "gemini-2.5-flash";
+
+    return generateEnglishNewsContent({
+      titleTh: parsed.titleTh,
+      summaryTh: parsed.summaryTh,
+      contentTh: parsed.contentTh,
+      category: parsed.category,
+      apiKey,
+      model,
+    });
   });
 }

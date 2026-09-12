@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Sparkles } from "lucide-react";
+import { Sparkles, Loader2, Languages } from "lucide-react";
+import { toast } from "sonner";
 import { useT } from "@/shared/lib/i18n/client";
 import {
   LiyonDialog,
@@ -14,6 +15,7 @@ import {
   LiyonSwitchRow,
 } from "@/shared/components/liyon";
 import { Button } from "@/components/ui/button";
+import { generateEnglishNewsAction } from "@/features/news/actions";
 import type { NewsFormData } from "./types";
 import type { NewsCategory, NewsStatus } from "@/features/news";
 
@@ -49,12 +51,64 @@ export function NewsDialog({
   const t = useT();
   const [errors, setErrors] = useState<Record<string, string>>({});
   const isEditing = Boolean(form.id);
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   const handleAutoSlug = () => {
     if (form.titleEn.trim()) {
       setForm((prev) => ({ ...prev, slug: slugify(prev.titleEn) }));
     } else if (form.titleTh.trim()) {
       setForm((prev) => ({ ...prev, slug: slugify(prev.titleTh) }));
+    }
+  };
+
+  const handleAiTranslate = async () => {
+    if (!form.titleTh.trim()) {
+      toast.error("กรุณากรอกหัวข้อข่าวภาษาไทยก่อนใช้งาน AI");
+      return;
+    }
+    if (!form.contentTh.trim()) {
+      toast.error("กรุณากรอกเนื้อหาข่าวภาษาไทยก่อนใช้งาน AI");
+      return;
+    }
+
+    setIsGeneratingAi(true);
+    try {
+      const res = await generateEnglishNewsAction({
+        titleTh: form.titleTh,
+        summaryTh: form.summaryTh,
+        contentTh: form.contentTh,
+        category: form.category,
+      });
+
+      if (!res.ok) {
+        toast.error("ไม่สามารถสร้างเนื้อหาภาษาอังกฤษด้วย AI ได้: " + (res.error.message || res.error.code));
+        return;
+      }
+
+      setForm((prev) => ({
+        ...prev,
+        titleEn: res.data.titleEn || prev.titleEn,
+        summaryEn: res.data.summaryEn || prev.summaryEn,
+        contentEn: res.data.contentEn || prev.contentEn,
+        slug: res.data.slug || prev.slug,
+      }));
+
+      // Clear validation errors for English fields if any
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next.titleEn;
+        delete next.summaryEn;
+        delete next.contentEn;
+        delete next.slug;
+        return next;
+      });
+
+      toast.success("✨ แปลและสร้างฉบับภาษาอังกฤษด้วย Google Gemini สำเร็จ!");
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : "เกิดข้อผิดพลาดในการเชื่อมต่อ AI";
+      toast.error(msg);
+    } finally {
+      setIsGeneratingAi(false);
     }
   };
 
@@ -85,6 +139,44 @@ export function NewsDialog({
       <form onSubmit={handleSubmit}>
         <LiyonDialogBody>
           <div className="space-y-4 py-2 max-h-[65vh] overflow-y-auto pr-1">
+            {/* AI Assistant Banner */}
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-3.5 rounded-xl bg-gradient-to-r from-purple-50 via-indigo-50 to-blue-50 border border-purple-200/80 shadow-xs">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 rounded-lg bg-purple-600 text-white shadow-xs">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-purple-950 m-0 flex items-center gap-1.5">
+                    ผู้ช่วย AI สองภาษา (Google Gemini)
+                    <span className="text-[10px] px-1.5 py-0.2 bg-purple-200/70 text-purple-800 rounded font-semibold">Gemini Flash</span>
+                  </h4>
+                  <p className="text-[11px] text-purple-700 m-0">
+                    พิมพ์เนื้อหาภาษาไทย แล้วกดปุ่มนี้เพื่อแปลและสร้าง Title, Summary, Content ภาษาอังกฤษพร้อม SEO Slug ให้อัตโนมัติ
+                  </p>
+                </div>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleAiTranslate}
+                disabled={isGeneratingAi || !form.titleTh.trim()}
+                className="gap-1.5 h-8.5 text-xs font-semibold bg-white hover:bg-purple-600 hover:text-white border-purple-300 text-purple-700 transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                {isGeneratingAi ? (
+                  <>
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-purple-600" />
+                    <span>Gemini กำลังสร้างฉบับ EN...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-3.5 h-3.5 text-purple-600" />
+                    <span>✨ สร้างฉบับภาษาอังกฤษด้วย AI</span>
+                  </>
+                )}
+              </Button>
+            </div>
+
             {/* Titles (Thai & English) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <LiyonField

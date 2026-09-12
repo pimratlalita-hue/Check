@@ -30,6 +30,16 @@ export const contactSettingsSchema = z.object({
   mapUrl: z.string().trim().default(""),
 });
 
+export const aiSettingsSchema = z.object({
+  geminiApiKey: z.string().trim().default(""),
+  model: z.string().trim().default("gemini-2.5-flash"),
+});
+
+export const testGeminiApiSchema = z.object({
+  apiKey: z.string().trim().min(1, "กรุณากรอก Gemini API Key"),
+  model: z.string().trim().default("gemini-2.5-flash"),
+});
+
 export const updateSettingsSchema = z.object({
   nameTh: z.string().trim().min(1).max(255),
   nameEn: z.string().trim().min(1).max(255),
@@ -45,10 +55,13 @@ export const updateSettingsSchema = z.object({
   palette: z.enum(PALETTE_IDS),
   smtp: smtpSettingsSchema.optional(),
   contact: contactSettingsSchema.optional(),
+  ai: aiSettingsSchema.optional(),
 });
 export const updateProfileSchema = z.object({ name: z.string().trim().min(1).max(255), locale: z.enum(["th", "en"]) });
 export type SmtpSettings = z.infer<typeof smtpSettingsSchema>;
 export type ContactSettings = z.infer<typeof contactSettingsSchema>;
+export type AiSettings = z.infer<typeof aiSettingsSchema>;
+export type TestGeminiApiInput = z.infer<typeof testGeminiApiSchema>;
 export type TestSmtpInput = z.infer<typeof testSmtpSchema>;
 export type UpdateSettingsInput = z.infer<typeof updateSettingsSchema>;
 export type UpdateProfileInput = z.infer<typeof updateProfileSchema>;

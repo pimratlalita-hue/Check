@@ -51,3 +51,23 @@ export const advisoryFeedbackResultSchema = z.object({
 });
 
 export type AdvisoryFeedbackResult = z.infer<typeof advisoryFeedbackResultSchema>;
+
+export const generateEnglishNewsInputSchema = z.object({
+  titleTh: z.string().trim().min(1, "title_th_required"),
+  summaryTh: z.string().trim().optional().nullable(),
+  contentTh: z.string().trim().min(1, "content_th_required"),
+  category: z.string().optional(),
+  apiKey: z.string().optional(),
+  model: z.string().optional(),
+});
+
+export type GenerateEnglishNewsInput = z.infer<typeof generateEnglishNewsInputSchema>;
+
+export const generatedEnglishNewsResultSchema = z.object({
+  titleEn: z.string(),
+  summaryEn: z.string(),
+  contentEn: z.string(),
+  slug: z.string(),
+});
+
+export type GeneratedEnglishNewsResult = z.infer<typeof generatedEnglishNewsResultSchema>;

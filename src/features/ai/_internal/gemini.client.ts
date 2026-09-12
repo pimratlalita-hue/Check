@@ -12,18 +12,19 @@ export function hasGeminiApiKey(): boolean {
 export async function callGemini(
   prompt: string,
   options: {
+    apiKey?: string;
     model?: string;
     systemInstruction?: string;
   } = {}
 ): Promise<string | null> {
-  const apiKey = getGeminiApiKey();
+  const apiKey = options.apiKey?.trim() || getGeminiApiKey();
   if (!apiKey) {
     return null;
   }
 
   try {
     const ai = new GoogleGenAI({ apiKey });
-    const model = options.model || "gemini-1.5-flash";
+    const model = options.model || "gemini-2.5-flash";
 
     const response = await ai.models.generateContent({
       model,

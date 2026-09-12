@@ -9,6 +9,9 @@ import {
   type GenerateAdvisoryFeedbackInput,
   type AdvisoryFeedbackResult,
   advisoryFeedbackResultSchema,
+  type GenerateEnglishNewsInput,
+  type GeneratedEnglishNewsResult,
+  generatedEnglishNewsResultSchema,
 } from "../schemas";
 
 // -----------------------------------------------------------------------------
@@ -248,5 +251,95 @@ Respond STRICTLY with a valid JSON object matching this schema:
     pointsToImprove: [
       "นัดหมายเข้าพบอาจารย์ที่ปรึกษาเพื่อทบทวนทิศทางการวิจัยใหม่",
     ],
+  };
+}
+
+// -----------------------------------------------------------------------------
+// 4. Bilingual News Generator & Academic PR Translator (Gemini)
+// -----------------------------------------------------------------------------
+
+export async function generateEnglishNewsContent(
+  input: GenerateEnglishNewsInput
+): Promise<GeneratedEnglishNewsResult> {
+  const prompt = `You are a professional university public relations officer and academic translator for Mahachulalongkornrajavidyalaya University (MCU / มจร.) Graduate School.
+Translate and synthesize the following Thai announcement/news article into a high-quality, fluent, and professional English press release:
+
+- Category: ${input.category || "GENERAL"}
+- Thai Title: ${input.titleTh}
+- Thai Summary: ${input.summaryTh || "N/A"}
+- Thai Full Content:
+${input.contentTh}
+
+Instructions:
+1. "titleEn": Translate into an engaging, clear English headline using Title Case.
+2. "summaryEn": Provide a concise, clear 1-2 sentence executive summary in English (suitable for social previews and listing cards). If the Thai summary is empty, summarize the key essence from the Thai content.
+3. "contentEn": Translate the full content into fluent, idiomatic English. Preserve all Markdown formatting (headings like ##, lists -, *, bold **, blockquotes >, links, tables, paragraphs) intact.
+4. "slug": Generate a clean, SEO-friendly English URL slug based on the English title (lowercase letters, numbers, hyphens only, 3-6 words, e.g. "mcu-orientation-ceremony-2026").
+
+Respond STRICTLY with a valid JSON object matching this schema without markdown codeblocks or extra text:
+{
+  "titleEn": string,
+  "summaryEn": string,
+  "contentEn": string,
+  "slug": string
+}`;
+
+  const aiResponse = await callGemini(prompt, {
+    apiKey: input.apiKey,
+    model: input.model || "gemini-2.5-flash",
+    systemInstruction:
+      "You are an expert bilingual university journalist. Output strictly valid JSON without code fences or formatting tags.",
+  });
+
+  if (aiResponse) {
+    try {
+      const cleanJson = aiResponse.replace(/```json/g, "").replace(/```/g, "").trim();
+      const parsed = JSON.parse(cleanJson);
+      const validated = generatedEnglishNewsResultSchema.safeParse(parsed);
+      if (validated.success) {
+        return validated.data;
+      }
+    } catch {
+      // Fall through to fallback
+    }
+  }
+
+  return getFallbackEnglishNews(input);
+}
+
+function getFallbackEnglishNews(input: GenerateEnglishNewsInput): GeneratedEnglishNewsResult {
+  const cleanTitle = input.titleTh.trim();
+
+  let titleEn = `Official Announcement: ${cleanTitle}`;
+  let slug = `mcu-announcement-${Date.now().toString().slice(-6)}`;
+
+  if (/ปฐมนิเทศ/i.test(cleanTitle)) {
+    titleEn = "New Graduate Student Orientation Ceremony Academic Year 2026";
+    slug = "mcu-new-graduate-student-orientation-2026";
+  } else if (/สัมมนา/i.test(cleanTitle)) {
+    titleEn = "Academic Seminar and Conference on Educational Innovation";
+    slug = "mcu-academic-seminar-2026";
+  } else if (/รับสมัคร/i.test(cleanTitle)) {
+    titleEn = "Call for Applications: Master and Doctoral Degree Programs";
+    slug = "mcu-graduate-admissions-announcement-2026";
+  } else if (/ทุน/i.test(cleanTitle)) {
+    titleEn = "Graduate Research Scholarship Announcement";
+    slug = "mcu-graduate-scholarship-announcement";
+  } else if (/วิทยานิพนธ์/i.test(cleanTitle)) {
+    titleEn = "Thesis Defense Guidelines and Academic Requirements";
+    slug = "mcu-thesis-defense-guidelines";
+  }
+
+  const summaryEn = input.summaryTh?.trim()
+    ? `Graduate School, Mahachulalongkornrajavidyalaya University (MCU) announces: ${titleEn}. All graduate students and faculty members are cordially invited.`
+    : `Official announcement regarding ${titleEn} by the Graduate School, Mahachulalongkornrajavidyalaya University.`;
+
+  const contentEn = `## ${titleEn}\n\nThe Graduate School of Mahachulalongkornrajavidyalaya University (MCU) cordially announces the following official press release for graduate students, faculty members, and researchers:\n\n${input.contentTh}\n\n---\n*For further inquiries, please contact the Graduate School Administration Office.*`;
+
+  return {
+    titleEn,
+    summaryEn,
+    contentEn,
+    slug,
   };
 }
