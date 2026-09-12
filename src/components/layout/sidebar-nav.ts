@@ -22,51 +22,88 @@ export interface NavGroup { label: string; items: NavItem[] }
 export interface NavCrumb { title: string; href: string }
 
 export const sidebarGroups: NavGroup[] = [
-  { label: "nav.group.overview", items: [{ title: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard }] },
+  // 1. ภาพรวม (Overview)
+  {
+    label: "nav.group.overview",
+    items: [{ title: "nav.dashboard", href: "/dashboard", icon: LayoutDashboard }],
+  },
+
+  // 2. งานวิชาการและหลักสูตร (Academic & Curriculums)
+  {
+    label: "nav.group.academic",
+    items: [
+      {
+        title: "nav.academic",
+        href: "/curriculum",
+        icon: GraduationCap,
+        children: [
+          { title: "curriculum.nav", href: "/curriculum", icon: GraduationCap, permission: CURRICULUM_P.curriculumRead },
+          { title: "staff.nav", href: "/staff", icon: UserCheck, permission: STAFF_P.staffRead },
+        ],
+      },
+    ],
+  },
+
+  // 3. กระบวนการวิทยานิพนธ์และการสอบ (Thesis & Examination)
+  {
+    label: "nav.group.thesis",
+    items: [
+      {
+        title: "nav.thesisExam",
+        href: "/workflow",
+        icon: FileCheck,
+        children: [
+          { title: "workflow.nav", href: "/workflow", icon: FileCheck, permission: WORKFLOW_P.workflowRead },
+          { title: "facility.nav", href: "/facility", icon: CalendarCheck, permission: FACILITY_P.facilityRead },
+          { title: "biometrics.navAttendance", href: "/biometrics", icon: ScanFace, permission: BIOMETRICS_P.read },
+        ],
+      },
+    ],
+  },
+
+  // 4. การสื่อสารและประชาสัมพันธ์ (Communications & News)
   {
     label: "news.nav",
     items: [{ title: "news.nav", href: "/news", icon: Newspaper, permission: NEWS_P.newsRead }],
   },
-  {
-    label: "staff.nav",
-    items: [{ title: "staff.nav", href: "/staff", icon: UserCheck, permission: STAFF_P.staffRead }],
-  },
-  {
-    label: "curriculum.nav",
-    items: [{ title: "curriculum.nav", href: "/curriculum", icon: GraduationCap, permission: CURRICULUM_P.curriculumRead }],
-  },
-  {
-    label: "workflow.nav",
-    items: [{ title: "workflow.nav", href: "/workflow", icon: FileCheck, permission: WORKFLOW_P.workflowRead }],
-  },
-  {
-    label: "facility.nav",
-    items: [{ title: "facility.nav", href: "/facility", icon: CalendarCheck, permission: FACILITY_P.facilityRead }],
-  },
-  {
-    label: "biometrics.title",
-    items: [{ title: "biometrics.navAttendance", href: "/biometrics", icon: ScanFace, permission: BIOMETRICS_P.read }],
-  },
-  {
-    label: "nav.group.sample",
-    items: [{ title: "sample.nav", href: "/sample", icon: Layers, permission: SAMPLE_P.sampleRead }],
-  },
+
+  // 5. ผู้ใช้งานและสิทธิ์ (Users & Access)
   {
     label: "nav.group.users",
-    items: [{
-      title: "nav.users", href: "/users", icon: Users, permission: P.usersRead,
-      children: [
-        { title: "nav.users", href: "/users", permission: P.usersRead },
-        { title: "nav.roles", href: "/users/roles", permission: P.rolesManage },
-      ],
-    }],
+    items: [
+      {
+        title: "nav.users",
+        href: "/users",
+        icon: Users,
+        permission: P.usersRead,
+        children: [
+          { title: "nav.users", href: "/users", permission: P.usersRead },
+          { title: "nav.roles", href: "/users/roles", permission: P.rolesManage },
+        ],
+      },
+    ],
   },
+
+  // 6. การตั้งค่าและการสำรองข้อมูล (Settings & Maintenance)
   {
     label: "nav.group.settings",
     items: [
-      { title: "nav.settings", href: "/settings", icon: Settings, permission: P.settingsManage },
-      { title: "backup.nav", href: "/backup", icon: DatabaseBackup, permission: BACKUP_P.backupManage },
+      {
+        title: "nav.systemSettings",
+        href: "/settings",
+        icon: Settings,
+        children: [
+          { title: "nav.settings", href: "/settings", permission: P.settingsManage },
+          { title: "backup.nav", href: "/backup", icon: DatabaseBackup, permission: BACKUP_P.backupManage },
+        ],
+      },
     ],
+  },
+
+  // 7. โมดูลตัวอย่าง (Development / Sample)
+  {
+    label: "nav.group.sample",
+    items: [{ title: "sample.nav", href: "/sample", icon: Layers, permission: SAMPLE_P.sampleRead }],
   },
 ];
 

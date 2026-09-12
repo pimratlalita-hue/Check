@@ -16,7 +16,8 @@ describe("sidebar-nav", () => {
   });
   it("admin เห็นครบ และกลุ่มที่ไม่มีรายการเหลือถูกตัด", () => {
     const groups = visibleGroups(admin);
-    expect(groups.flatMap((g) => g.items.map((i) => i.href))).toEqual(expect.arrayContaining(["/dashboard", "/users", "/settings", "/news", "/staff", "/curriculum", "/workflow", "/facility", "/biometrics", "/backup"]));
+    const allHrefs = groups.flatMap((g) => g.items.flatMap((i) => [i.href, ...(i.children ?? []).map((c) => c.href)]));
+    expect(allHrefs).toEqual(expect.arrayContaining(["/dashboard", "/users", "/settings", "/news", "/staff", "/curriculum", "/workflow", "/facility", "/biometrics", "/backup"]));
     expect(groups.every((g) => g.items.length > 0)).toBe(true);
   });
   it("getActiveNavChain เลือก href ที่ตรงที่สุด", () => {
@@ -24,5 +25,5 @@ describe("sidebar-nav", () => {
     expect(getActiveNavChain("/settings").map((c) => c.href)).toEqual(["/settings"]);
     expect(getActiveNavChain("/nowhere")).toEqual([]);
   });
-  it("โครงเมนูมี 10 กลุ่ม", () => expect(sidebarGroups).toHaveLength(10));
+  it("โครงเมนูมี 7 กลุ่ม", () => expect(sidebarGroups).toHaveLength(7));
 });
