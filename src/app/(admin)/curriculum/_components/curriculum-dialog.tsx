@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { GraduationCap, BookOpen, Target, Plus, Trash2 } from "lucide-react";
+import { GraduationCap, BookOpen, Target, Plus, Trash2, Upload, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { useT } from "@/shared/lib/i18n/client";
 import {
@@ -89,6 +89,40 @@ export function CurriculumDialog({
   const [formData, setFormData] = useState<ProgramFormData>(() =>
     getInitialProgramFormData(program)
   );
+  const [isUploadingDoc, setIsUploadingDoc] = useState(false);
+
+  const handleUploadHandbook = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.name.toLowerCase().endsWith(".pdf") && file.type !== "application/pdf") {
+      toast.error("กรุณาเลือกไฟล์ PDF เท่านั้น");
+      return;
+    }
+
+    setIsUploadingDoc(true);
+    const body = new FormData();
+    body.append("file", file);
+
+    try {
+      const res = await fetch("/api/documents/upload", {
+        method: "POST",
+        body,
+      });
+      const data = await res.json();
+      if (data.ok && data.url) {
+        setFormData((prev) => ({ ...prev, handbookUrl: data.url }));
+        toast.success(`อัปโหลดเอกสาร มคอ.2 เรียบร้อยแล้ว (${file.name})`);
+      } else {
+        toast.error(data.error || "เกิดข้อผิดพลาดในการอัปโหลด");
+      }
+    } catch {
+      toast.error("ไม่สามารถอัปโหลดไฟล์ได้");
+    } finally {
+      setIsUploadingDoc(false);
+      e.target.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -484,12 +518,48 @@ export function CurriculumDialog({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <div>
                     <LiyonField label={t("curriculum.handbookUrl")}>
-                      <input
-                        type="text"
-                        value={formData.handbookUrl}
-                        onChange={(e) => setFormData({ ...formData, handbookUrl: e.target.value })}
-                        placeholder="https://example.com/handbook.pdf"
-                      />
+                      <div className="space-y-2">
+                        <div className="flex gap-2">
+                          <input
+                            type="text"
+                            value={formData.handbookUrl}
+                            onChange={(e) => setFormData({ ...formData, handbookUrl: e.target.value })}
+                            placeholder="https://example.com/handbook.pdf หรือกดอัปโหลด"
+                            className="flex-1"
+                          />
+                          <label className="inline-flex items-center gap-1.5 px-3 py-2 border border-slate-300 rounded-lg text-xs font-medium text-slate-700 bg-white hover:bg-slate-50 cursor-pointer shrink-0 transition-colors shadow-xs">
+                            <Upload className="h-3.5 w-3.5 text-rose-600" />
+                            <span>{isUploadingDoc ? "กำลังอัปโหลด..." : "อัปโหลด PDF"}</span>
+                            <input
+                              type="file"
+                              accept=".pdf,application/pdf"
+                              className="hidden"
+                              disabled={isUploadingDoc}
+                              onChange={handleUploadHandbook}
+                            />
+                          </label>
+                        </div>
+                        {formData.handbookUrl && (
+                          <div className="flex items-center gap-2 text-xs text-slate-600 bg-slate-50 p-2 rounded-lg border border-slate-200">
+                            <FileText className="h-4 w-4 text-rose-600 shrink-0" />
+                            <a
+                              href={formData.handbookUrl}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-rose-600 hover:underline truncate flex-1 font-mono text-[11px]"
+                            >
+                              {formData.handbookUrl}
+                            </a>
+                            <button
+                              type="button"
+                              onClick={() => setFormData({ ...formData, handbookUrl: "" })}
+                              className="text-slate-400 hover:text-red-600 text-xs px-1 font-semibold"
+                            >
+                              ลบ
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </LiyonField>
                   </div>
                   <div>

@@ -10,6 +10,7 @@ const PUBLIC_PREFIXES = [
   "/api/health",
   "/api/notifications",
   "/api/documents/",
+  "/documents/",
   "/_next/",
   "/favicon.ico",
 ];
@@ -58,5 +59,5 @@ export async function proxy(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"],
+  matcher: ["/((?!_next/static|_next/image|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|pdf)$).*)"],
 };
